@@ -1,0 +1,126 @@
+# ||--------------------------------------------------------------------------------||
+# ||                              StarArr Applications                              ||
+# ||--------------------------------------------------------------------------------||
+version: "3.6"
+
+services:
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1024
+      - PGID=100
+      - TZ=America/Chicago
+    networks:
+      - media
+    volumes:
+      - /volume1/docker/bazarr:/config
+      - /volume1/Movies:/movies
+      - /volume1/TV:/tv
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=1024
+      - PGID=100
+      - TZ=America/Chicago
+    networks:
+      - media
+    ports:
+      - 8686:8686
+    volumes:
+      - /volume1/docker/lidarr:/config
+      - /volume1/Music:/music
+      - /volume1/Data/complete:/complete
+      - /volume1/Data/incomplete:/incomplete
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1024
+      - PGID=100
+      - TZ=America/Chicago
+    networks:
+      - media
+    volumes:
+      - /volume1/docker/prowlarr:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1024
+      - PGID=100
+      - TZ=America/Chicago
+    networks:
+      - media
+    volumes:
+      - /volume1/Movies:/movies
+      - /volume1/docker/radarr:/config
+      - /volume1/Data/complete:/complete
+      - /volume1/Data/incomplete:/incomplete
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr
+    environment:
+      - PUID=1024
+      - PGID=100
+      - TZ=America/Chicago
+    networks:
+      - media
+    volumes:
+      - /volume1/Books:/books
+      - /volume1/docker/readarr:/config
+      - /volume1/Data/complete:/complete
+      - /volume1/Data/incomplete:/incomplete
+    ports:
+      - 8787:8787
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1024
+      - PGID=100
+      - TZ=America/Chicago
+    networks:
+      - media
+    volumes:
+      - /volume1/TV:/tv
+      - /volume1/docker/sonarr:/config
+      - /volume1/Data/complete:/complete
+      - /volume1/Data/incomplete:/incomplete
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+networks:
+  media:
+    name: media
+    external: true
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: "media"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.host_binding_ipv4: "0.0.0.0"
+      com.docker.network.driver.mtu: "1500"
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          ip_range: ${IP_RANGE}
+          gateway: ${GATEWAY_IP}

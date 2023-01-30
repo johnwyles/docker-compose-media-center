@@ -1,0 +1,352 @@
+# ||--------------------------------------------------------------------------------||
+# ||                            Downloading Applications                            ||
+# ||--------------------------------------------------------------------------------||
+version: "3.6"
+
+services:
+  delugevpn:
+    image: binhex/arch-delugevpn:latest
+    container_name: delugevpn
+    hostname: delugevpn
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+    environment:
+      - DEBUG=true
+      - DELUGE_DAEMON_LOG_LEVEL=info
+      - DELUGE_WEB_LOG_LEVEL=info
+      - ENABLE_PRIVOXY=yes
+      - LAN_NETWORK=192.168.0.0/16
+      - NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1
+      - PGID=100
+      - PUID=1024
+      - STRICT_PORT_FORWARD=yes
+      - UMASK=002
+      - VPN_CLIENT=openvpn
+      - VPN_ENABLED=yes
+      - VPN_INPUT_PORTS=1234
+      - VPN_OPTIONS=
+      - VPN_OUTPUT_PORTS=5678
+      - VPN_PASS=${VPN_PASS}
+      - VPN_PROV=pia
+      - VPN_USER=${VPN_USER}
+    networks:
+      - media
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/Data/complete:/complete
+      - /volume1/Data/incomplete:/incomplete
+      - /volume1/Data/torrents:/watch
+      - /volume1/docker/delugevpn:/config
+    ports:
+      - 8112:8112
+      - 8119:8118
+      - 58846:58846
+      - 58946:58946
+
+      # nzbget
+      - 6789:6789
+      - 6791:6791
+
+      # sabnzbd
+      - 8080:8080
+      - 8090:8090
+
+      #transmission
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
+    restart: unless-stopped
+
+  nzbget:
+    image: lscr.io/linuxserver/nzbget:latest
+    container_name: nzbget
+    # hostname: nzbget
+    environment:
+      - NZBGET_PASS=
+      - NZBGET_USER=
+      - PUID=1024
+      - PGID=100
+      - TZ=America/Chicago
+      - UMASK=002
+    networks:
+      - media
+    network_mode: "service:delugevpn"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/Data/complete:/complete
+      - /volume1/Data/incomplete:/incomplete
+      - /volume1/Data/watch:/watch
+      - /volume1/docker/nzbget:/config
+    # ports:
+    #   - 6789:6789
+    restart: unless-stopped
+
+  # nzbgetvpn:
+  #   image: jshridha/docker-nzbgetvpn:latest
+  #   container_name: nzbgetvpn
+  #   hostname: nzbgetvpn
+  #   cap_add:
+  #     - NET_ADMIN
+  #   privileged: true
+  #   environment:
+  #     - ADDITIONAL_PORTS=1234
+  #     - DEBUG=true
+  #     - ENABLE_PRIVOXY=yes
+  #     - HEALTH_CHECK_HOST=1.1.1.1
+  #     - INSTALL_PYTHON3=yes
+  #     - LAN_NETWORK=192.168.0.0/24
+  #     - NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1
+  #     - PGID=100
+  #     - PUID=1024
+  #     - STRICT_PORT_FORWARD=no
+  #     - UMASK=002
+  #     - VPN_CLIENT=openvpn
+  #     - VPN_ENABLED=yes
+  #     - VPN_PASSWORD=${VPN_PASS}
+  #     - VPN_PROV=pia
+  #     - VPN_TYPE=openvpn
+  #     - VPN_USERNAME=${VPN_USER}
+  #     - WEBUI_PASSWORD=${NZBGET_WEBUI_PASSWORD}
+  #     - WEBUI_USERNAME=${NZBGET_WEBUI_USERNAME}
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - /volume1/Data/complete:/complete
+  #     - /volume1/Data/incomplete:/incomplete
+  #     - /volume1/docker/nzbgetvpn:/config
+  #   ports:
+  #     - 6789:6789
+  #     - 6791:6791
+  #   restart: unless-stopped
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    # hostname: sabnzbd
+    environment:
+      - PUID=1024
+      - PGID=100
+      - TZ=America/Chicago
+      - UMASK=002
+    networks:
+      - media
+    network_mode: "service:delugevpn"
+    volumes:
+      - /volume1/Data/complete:/complete
+      - /volume1/Data/incomplete:/incomplete
+      - /volume1/Data/watch:/watch
+      - /volume1/docker/sabnzbd:/config
+    # ports:
+    #   - 8080:8080
+    restart: unless-stopped
+
+  # sabnzbdvpn:
+  #   image: binhex/arch-sabnzbdvpn:latest
+  #   container_name: sabnzbdvpn
+  #   hostname: sabnzbdvpn
+  #   cap_add:
+  #     - NET_ADMIN
+  #   privileged: true
+  #   environment:
+  #     - DEBUG=true
+  #     - DELUGE_DAEMON_LOG_LEVEL=info
+  #     - DELUGE_WEB_LOG_LEVEL=info
+  #     - ENABLE_PRIVOXY=yes
+  #     - LAN_NETWORK=192.168.0.0/16
+  #     - NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1
+  #     - PGID=100
+  #     - PUID=1024
+  #     - STRICT_PORT_FORWARD=yes
+  #     - UMASK=002
+  #     - VPN_CLIENT=openvpn
+  #     - VPN_ENABLED=yes
+  #     - VPN_INPUT_PORTS=1234
+  #     - VPN_OPTIONS=
+  #     - VPN_OUTPUT_PORTS=5678
+  #     - VPN_PASS=${VPN_PASS}
+  #     - VPN_PROV=pia
+  #     - VPN_USER=${VPN_USER}
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - /volume1/Data/complete:/complete
+  #     - /volume1/Data/incomplete:/incomplete
+  #     - /volume1/docker/sabnzbdvpn:/config
+  #   ports:
+  #     - 8080:8080
+  #     - 8090:8090
+  #     - 8118:8118
+  #   restart: unless-stopped
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    # hostname: transmission
+    environment:
+      # - HOST_WHITELIST=
+      # - PASS=
+      # - PEERPORT=
+      - PGID=100
+      - PUID=1024
+      - TRANSMISSION_DOWNLOAD_DIR=/complete
+      - TRANSMISSION_INCOMPLETE_DIR=/incomplete
+      - TRANSMISSION_WEB_HOME=/combustion-release/ #optional
+      - TRANSMISSION_WEB_UI=flood-for-transmission
+      - TZ=America/Chicago
+      - UMASK=002
+      # - USER=
+      # - WHITELIST=
+    networks:
+      - media
+    network_mode: "service:delugevpn"
+    volumes:
+      - /volume1/Data/complete:/complete
+      - /volume1/Data/incomplete:/incomplete
+      - /volume1/Data/watch:/watch
+      - /volume1/docker/transmission:/config
+    # ports:
+    #   - 9091:9091
+    #   - 51413:51413
+    #   - 51413:51413/udp
+    restart: unless-stopped
+
+  # transmission-openvpn:
+  #   image: haugene/transmission-openvpn
+  #   container_name: transmission-openvpn
+  #   hostname: transmission-openvpn
+  #   cap_add:
+  #     - NET_ADMIN
+  #   privileged: true
+  #   dns:
+  #     - 8.8.8.8
+  #     - 8.8.4.4
+  #   environment:
+  #     - LOCAL_NETWORK=192.168.0.0/16
+  #     - OPENVPN_CONFIG=${OPENVPN_CONFIG}
+  #     - OPENVPN_OPTS=
+  #     - OPENVPN_PASSWORD=${VPN_PASS}
+  #     - OPENVPN_PROVIDER=PIA
+  #     - OPENVPN_USERNAME=${VPN_USER}
+  #     - PGID=100
+  #     - PUID=1024
+  #     - TRANSMISSION_DOWNLOAD_DIR=/complete
+  #     - TRANSMISSION_INCOMPLETE_DIR=/incomplete
+  #     - TRANSMISSION_WEB_UI=flood-for-transmission
+  #     - TZ=America/Chicago
+  #     - UMASK=002
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: 10m
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - /volume1/Data/complete:/complete
+  #     - /volume1/Data/incomplete:/incomplete
+  #     - /volume1/Data/torrents:/torrents
+  #     - /volume1/docker/transmission-openvpn:/config
+  #     - /volume1/docker/transmission-openvpn/openvpn:/etc/openvpn/custom
+  #   ports:
+  #     - 9091:9091
+  #   restart: unless-stopped
+
+  unpackerr:
+    image: golift/unpackerr
+    container_name: unpackerr
+    # hostname: unpackerr
+    user: 1024:100
+    environment:
+      - PGID=100
+      - PUID=1024
+      - TZ=America/Chicago
+      - UN_DEBUG=true
+      - UN_DIR_MODE=0755
+      - UN_FILE_MODE=0644
+      - UN_FOLDER_0_DELETE_AFTER=10m
+      - UN_FOLDER_0_DELETE_FILES=false
+      - UN_FOLDER_0_DELETE_ORIGINAL=false
+      - UN_FOLDER_0_EXTRACT_ISOS=true
+      - UN_FOLDER_0_EXTRACT_PATH=/complete
+      - UN_FOLDER_0_MOVE_BACK=false
+      - UN_FOLDER_0_PATH=/complete
+      - UN_INTERVAL=2m
+      - UN_LIDARR_0_API_KEY=${UN_LIDARR_0_API_KEY}
+      - UN_LIDARR_0_DELETE_DELAY=5m
+      - UN_LIDARR_0_DELETE_ORIG=false
+      - UN_LIDARR_0_PATHS_0=/complete
+      - UN_LIDARR_0_PROTOCOLS=torrent,usenet
+      - UN_LIDARR_0_TIMEOUT=10s
+      - UN_LIDARR_0_URL=http://lidarr:8686
+      - UN_LOG_FILE_MB=10
+      - UN_LOG_FILE=
+      - UN_LOG_FILES=10
+      - UN_MAX_RETRIES=3
+      - UN_PARALLEL=1
+      - UN_RADARR_0_API_KEY=${UN_RADARR_0_API_KEY}
+      - UN_RADARR_0_DELETE_DELAY=5m
+      - UN_RADARR_0_DELETE_ORIG=false
+      - UN_RADARR_0_PATHS_0=/complete
+      - UN_RADARR_0_PROTOCOLS=torrent,usenet
+      - UN_RADARR_0_TIMEOUT=10s
+      - UN_RADARR_0_URL=http://radarr:7878
+      - UN_READARR_0_API_KEY=${UN_READARR_0_API_KEY}
+      - UN_READARR_0_DELETE_DELAY=5m
+      - UN_READARR_0_DELETE_ORIG=false
+      - UN_READARR_0_PATHS_0=/complete
+      - UN_READARR_0_PROTOCOLS=torrent,usenet
+      - UN_READARR_0_TIMEOUT=10s
+      - UN_READARR_0_URL=http://readarr:8787
+      - UN_RETRY_DELAY=5m
+      - UN_SONARR_0_API_KEY=${UN_SONARR_0_API_KEY}
+      - UN_SONARR_0_DELETE_DELAY=5m
+      - UN_SONARR_0_DELETE_ORIG=false
+      - UN_SONARR_0_PATHS_0=/complete
+      - UN_SONARR_0_PROTOCOLS=torrent,usenet
+      - UN_SONARR_0_TIMEOUT=10s
+      - UN_SONARR_0_URL=http://sonarr:8989
+      - UN_START_DELAY=1m
+      # - UN_CMDHOOK_0_COMMAND=
+      # - UN_CMDHOOK_0_EVENTS_0=0
+      # - UN_CMDHOOK_0_EXCLUDE_0=
+      # - UN_CMDHOOK_0_NAME=
+      # - UN_CMDHOOK_0_SHELL=false
+      # - UN_CMDHOOK_0_SILENT=false
+      # - UN_CMDHOOK_0_TIMEOUT=10s
+      # - UN_WEBHOOK_0_CHANNEL=
+      # - UN_WEBHOOK_0_CONTENT_TYPE=application/json
+      # - UN_WEBHOOK_0_EVENTS_0=0
+      # - UN_WEBHOOK_0_EXCLUDE_0=
+      # - UN_WEBHOOK_0_IGNORE_SSL=false
+      # - UN_WEBHOOK_0_NAME=
+      # - UN_WEBHOOK_0_NICKNAME=Unpackerr
+      # - UN_WEBHOOK_0_SILENT=false
+      # - UN_WEBHOOK_0_TEMPLATE_PATH=
+      # - UN_WEBHOOK_0_TIMEOUT=10s
+      # - UN_WEBHOOK_0_URL=
+    networks:
+      - media
+    network_mode: "service:delugevpn"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /volume1/Data/complete:/complete
+    restart: always
+
+networks:
+  media:
+    name: media
+    external: true
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.bridge.host_binding_ipv4: "0.0.0.0"
+      com.docker.network.bridge.name: "media"
+      com.docker.network.driver.mtu: "1500"
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY_IP}
+          ip_range: ${IP_RANGE}

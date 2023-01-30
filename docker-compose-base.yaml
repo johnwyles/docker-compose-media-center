@@ -1,0 +1,108 @@
+# ||--------------------------------------------------------------------------------||
+# ||                               Other Applications                               ||
+# ||--------------------------------------------------------------------------------||
+version: "3.6"
+
+services:
+  portainer:
+    image: portainer/portainer:latest
+    container_name: portainer
+    hostname: portainer
+    environment:
+      - PGID=100
+      - PUID=1024
+      - TZ=America/Chicago
+      - UMASK=002
+    ports:
+      - 8000:8000
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /volume1/docker/portainer:/data
+    command: -H unix:///var/run/docker.sock
+    restart: always
+
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    hostname: syncthing
+    environment:
+      - PGID=100
+      - PUID=1024
+      - TZ=America/Chicago
+      - UMASK=002
+    networks:
+      - media
+    volumes:
+      - /volume1/Data:/downloads
+      - /volume1/docker/syncthing:/config
+      - /volume1/Documents/sync:/sync
+    ports:
+      - 21027:21027/udp
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      - 8384:8384
+    restart: unless-stopped
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    hostname: extropy-nas-tailscale
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_MODULE
+    privileged: true
+    environment:
+      - PGID=100
+      - PUID=1024
+      - TAILSCALE_HOSTNAME=extropy-nas-tailscale
+      - TAILSCALE_STATE_ARG="mem:"
+      - TS_AUTH_KEY=${TS_AUTH_KEY:?err}
+      - TZ=America/Chicago
+      - UMASK=002
+    network_mode: host
+    volumes:
+      - /volume1/docker/tailscale:/var/lib
+      - /dev/net/tun:/dev/net/tun
+    restart: unless-stopped
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    hostname: watchtower
+    environment:
+      - PGID=100
+      - PUID=1024
+      - TZ=America/Chicago
+      - UMASK=002
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_INCLUDE_RESTARTING=true
+      - WATCHTOWER_LABEL_ENABLE=true
+      - WATCHTOWER_NOTIFICATION_REPORT=true
+      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_NOTIFICATION_URL}
+      - WATCHTOWER_POLL_INTERVAL=21600
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - media
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+networks:
+  media:
+    name: media
+    # external: true
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.bridge.host_binding_ipv4: "0.0.0.0"
+      com.docker.network.bridge.name: "media"
+      com.docker.network.driver.mtu: "1500"
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY_IP}
+          ip_range: ${IP_RANGE}
