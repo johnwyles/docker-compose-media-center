@@ -8,15 +8,15 @@ services:
     image: golift/notifiarr
     container_name: notifiarr
     environment:
-      - PGID=100
-      - PUID=1024
-      - TZ=America/Chicago
-      - UMASK=002
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
     networks:
       - media
     volumes:
       - /var/run/utmp:/var/run/utmp
-      - /volume1/docker/notifiarr/notifiarr.conf:/config/notifiarr.conf
+      - ${CONFIG_BASE_DIR}/notifiarr/notifiarr.conf:/config/notifiarr.conf
     ports:
       - 5454:5454
     restart: unless-stopped
@@ -25,14 +25,14 @@ services:
     image: lscr.io/linuxserver/overseerr:latest
     container_name: overseerr
     environment:
-      - PGID=100
-      - PUID=1024
-      - TZ=America/Chicago
-      - UMASK=002
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
     networks:
       - media
     volumes:
-      - /volume1/docker/overseerr:/config
+      - ${CONFIG_BASE_DIR}/overseerr:/config
     ports:
       - 5055:5055
     restart: unless-stopped
@@ -41,20 +41,20 @@ services:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
     environment:
-      - PGID=100
+      - PGID=${PGID}
       - PLEX_CLAIM=${PLEX_CLAIM}
       - PLEX_PASS=yes
-      - PUID=1024
-      - UMASK=002
+      - PUID=${PUID}
+      - UMASK=${UMASK}
       - VERSION=docker
     networks:
       - media
     volumes:
-      - /volume1/Books:/books
-      - /volume1/docker/plex/config:/config
-      - /volume1/Movies:/movies
+      - ${BOOKS_DIR_LOCAL}:${BOOKS_DIR_RELATIVE}
+      - ${CONFIG_BASE_DIR}/plex/config:/config
+      - ${MOVIES_DIR_LOCAL}:${MOVIES_DIR_RELATIVE}
       - /volume1/Music:/music
-      - /volume1/TV:/tv
+      - ${TV_DIR_LOCAL}:${TV_DIR_RELATIVE}
     ports:
       - 3005:3005
       - 32400:32400
@@ -70,14 +70,14 @@ services:
     image: lscr.io/linuxserver/tautulli:latest
     container_name: tautulli
     environment:
-      - PGID=100
-      - PUID=1024
-      - TZ=America/Chicago
-      - UMASK=002
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
     networks:
       - media
     volumes:
-      - /volume1/docker/tautulli:/config
+      - ${CONFIG_BASE_DIR}/tautulli:/config
     ports:
       - 8181:8181
     restart: unless-stopped
