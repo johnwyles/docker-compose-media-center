@@ -4,122 +4,239 @@
 version: "3.6"
 
 services:
-  deluge:
-    image: lscr.io/linuxserver/deluge:latest
-    container_name: deluge
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - DELUGE_LOGLEVEL=info
-      - UMASK=${UMASK}
-    network_mode: "service:transmission-openvpn"
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-      - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
-      - ${CONFIG_BASE_DIR}/deluge:/config
-    restart: unless-stopped
+  # deluge:
+  #   image: lscr.io/linuxserver/deluge:latest
+  #   container_name: deluge
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #     - DELUGE_LOGLEVEL=info
+  #     - UMASK=${UMASK}
+  #   network_mode: "service:transmission-openvpn"
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${CONFIG_BASE_DIR}/deluge:/config
+  #   restart: unless-stopped
 
-  nzbget:
-    image: lscr.io/linuxserver/nzbget:latest
-    container_name: nzbget
-    environment:
-      - NZBGET_PASS=${NZBGET_WEBUI_PASSWORD}
-      - NZBGET_USER=${NZBGET_WEBUI_USERNAME}
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    network_mode: "service:transmission-openvpn"
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-      - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
-      - ${CONFIG_BASE_DIR}/nzbget:/config
-    restart: unless-stopped
-
-  sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:latest
-    container_name: sabnzbd
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    network_mode: "service:transmission-openvpn"
-    volumes:
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-      - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
-      - ${CONFIG_BASE_DIR}/sabnzbd:/config
-    restart: unless-stopped
-
-  transmission-openvpn:
-    image: haugene/transmission-openvpn
-    container_name: transmission-openvpn
-    hostname: transmission-openvpn
+  delugevpn:
+    container_name: delugevpn
+    image: binhex/arch-delugevpn
     cap_add:
       - NET_ADMIN
-    privileged: true
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
     environment:
-      - DEBUG=true
-      - ENABLE_UFW=true
-      - GLOBAL_APPLY_PERMISSIONS=false
-      - HEALTH_CHECK_HOST=${HEALTH_CHECK_HOST}
-      - LOCAL_NETWORK=
-      - OPENVPN_CONFIG=${OPENVPN_CONFIG}
-      - OPENVPN_OPTS=${OPENVPN_OPTS}
-      - OPENVPN_PASSWORD=${VPN_PASS}
-      - OPENVPN_PROVIDER=${OPENVPN_PROVIDER}
-      - OPENVPN_USERNAME=${VPN_USER}
-      - PEER_DNS=false
-      - PEER_DNS_PIN_ROUTES=false
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - TRANSMISSION_DOWNLOAD_DIR=${DATA_DIR_COMPLETE_RELATIVE}
-      - TRANSMISSION_INCOMPLETE_DIR=${DATA_DIR_INCOMPLETE_RELATIVE}
-      - TRANSMISSION_WEB_UI=flood-for-transmission
-      - TZ=${TZ}
-      - UFW_ALLOW_GW_NET=true
-      - UFW_DISABLE_IPTABLES_REJECT=true
-      - UFW_EXTRA_PORTS=6789,6881,8080,8112,9091,9910
-      - UMASK=${UMASK}
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
+      VPN_ENABLED: ${VPN_ENABLED}
+      VPN_USER: ${VPN_USER}
+      VPN_PASS: ${VPN_PASS}
+      VPN_PROV: ${VPN_PROV}
+      VPN_OPTIONS: ${VPN_OPTIONS}
+      STRICT_PORT_FORWARD: ${STRICT_PORT_FORWARD}
+      ENABLE_PRIVOXY: ${ENABLE_PRIVOXY}
+      LAN_NETWORK: ${LAN_NETWORK}
+      NAME_SERVERS: ${NAME_SERVERS}
+      VPN_CLIENT: ${VPN_CLIENT}
+      DELUGE_ENABLE_WEBUI_PASSWORD: ${DELUGE_ENABLE_WEBUI_PASSWORD}
+      DELUGE_DAEMON_LOG_LEVEL: ${DELUGE_DAEMON_LOG_LEVEL}
+      DELUGE_WEB_LOG_LEVEL: ${DELUGE_WEB_LOG_LEVEL}
+      ADDITIONAL_PORTS: ${ADDITIONAL_PORTS}
+      DEBUG: ${DEBUG}
+      UMASK: ${UMASK}
+      PUID: ${PUID}
+      PGID: ${PGID}
     networks:
       - media
-    command: [ "dumb-init", "/entrypoint.sh", "/etc/openvpn/start.sh" ]
+    ports:
+      - 8112:8112
+      - 8118:8118
+      - 58846:58846
+      - 58946:58946
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
       - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
       - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
-      - ${CONFIG_BASE_DIR}/transmission-openvpn:/config
-      - ${CONFIG_BASE_DIR}/transmission-openvpn/entrypoint.sh:/entrypoint.sh
-      - ${CONFIG_BASE_DIR}/transmission-openvpn/openvpn:/etc/openvpn/custom
-    ports:
-      # deluge
-      - 8112:8112
-      - 6881:6881
-      - 6881:6881/udp
-      - 9910:9910
-
-      # nzbget
-      - 6789:6789
-
-      # sabnzbd
-      - 8080:8080
-
-      #transmission
-      - 9091:9091
+      - ${CONFIG_BASE_DIR}/delugevpn:/config
     restart: unless-stopped
+
+  # nzbget:
+  #   image: lscr.io/linuxserver/nzbget:latest
+  #   container_name: nzbget
+  #   environment:
+  #     - NZBGET_PASS=${NZBGET_WEBUI_PASSWORD}
+  #     - NZBGET_USER=${NZBGET_WEBUI_USERNAME}
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   networks:
+  #     - media
+  #   # network_mode: "service:transmission-openvpn"
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${CONFIG_BASE_DIR}/nzbget:/config
+  #   ports:
+  #     # nzbget
+  #     - 6789:6789
+  #   restart: unless-stopped
+
+  # nzbgetvpn:
+  #   image: jarlave/nzbgetvpn:2020112501
+  #   container_name: nzbgetvpn
+  #   cap_add:
+  #     - NET_ADMIN
+  #   environment:
+  #     - VPN_ENABLED=${VPN_ENABLED}
+  #     - VPN_USER=${VPN_USER}
+  #     - VPN_PASS=${VPN_PASS}
+  #     - VPN_PROV=${VPN_PROV}
+  #     - VPN_OPTIONS=${VPN_OPTIONS}
+  #     - STRICT_PORT_FORWARD=${STRICT_PORT_FORWARD}
+  #     - ENABLE_PRIVOXY=${ENABLE_PRIVOXY}
+  #     - LAN_NETWORK=${LAN_NETWORK}
+  #     - NAME_SERVERS=${NAME_SERVERS}
+  #     - VPN_CLIENT=${VPN_CLIENT}
+  #     - DELUGE_ENABLE_WEBUI_PASSWORD=${DELUGE_ENABLE_WEBUI_PASSWORD}
+  #     - DELUGE_DAEMON_LOG_LEVEL=${DELUGE_DAEMON_LOG_LEVEL}
+  #     - DELUGE_WEB_LOG_LEVEL=${DELUGE_WEB_LOG_LEVEL}
+  #     - ADDITIONAL_PORTS=${ADDITIONAL_PORTS}
+  #     - DEBUG=${DEBUG}
+  #     - UMASK=${UMASK}
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #   networks:
+  #     - media
+  #   # network_mode: "service:transmission-openvpn"
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${CONFIG_BASE_DIR}/nzbgetvpn:/config
+  #   ports:
+  #     # nzbget
+  #     - 6789:6789
+  #   restart: unless-stopped
+
+  # sabnzbd:
+  #   image: lscr.io/linuxserver/sabnzbd:latest
+  #   container_name: sabnzbd
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   network_mode: "service:transmission-openvpn"
+  #   volumes:
+  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${CONFIG_BASE_DIR}/sabnzbd:/config
+  #   restart: unless-stopped
+
+  sabnzbdvpn:
+    container_name: sabnzbdvpn
+    image: binhex/arch-sabnzbdvpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      VPN_ENABLED: ${VPN_ENABLED}
+      VPN_USER: ${VPN_USER}
+      VPN_PASS: ${VPN_PASS}
+      VPN_PROV: ${VPN_PROV}
+      VPN_OPTIONS: ${VPN_OPTIONS}
+      STRICT_PORT_FORWARD: ${STRICT_PORT_FORWARD}
+      ENABLE_PRIVOXY: ${ENABLE_PRIVOXY}
+      LAN_NETWORK: ${LAN_NETWORK}
+      NAME_SERVERS: ${NAME_SERVERS}
+      VPN_CLIENT: ${VPN_CLIENT}
+      DELUGE_ENABLE_WEBUI_PASSWORD: ${DELUGE_ENABLE_WEBUI_PASSWORD}
+      DELUGE_DAEMON_LOG_LEVEL: ${DELUGE_DAEMON_LOG_LEVEL}
+      DELUGE_WEB_LOG_LEVEL: ${DELUGE_WEB_LOG_LEVEL}
+      ADDITIONAL_PORTS: ${ADDITIONAL_PORTS}
+      DEBUG: ${DEBUG}
+      UMASK: ${UMASK}
+      PUID: ${PUID}
+      PGID: ${PGID}
+    networks:
+      - media
+    ports:
+      - 8080:8080
+      - 8090:8090
+      - 8119:8118
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+      - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+      - ${CONFIG_BASE_DIR}/sabnzbdvpn:/config
+    restart: unless-stopped
+
+  # transmission-openvpn:
+  #   image: haugene/transmission-openvpn
+  #   container_name: transmission-openvpn
+  #   hostname: transmission-openvpn
+  #   cap_add:
+  #     - NET_ADMIN
+  #   privileged: true
+  #   dns:
+  #     - 8.8.8.8
+  #     - 8.8.4.4
+  #   environment:
+  #     - DEBUG=true
+  #     - ENABLE_UFW=true
+  #     - GLOBAL_APPLY_PERMISSIONS=false
+  #     - HEALTH_CHECK_HOST=${HEALTH_CHECK_HOST}
+  #     - LOCAL_NETWORK=
+  #     - OPENVPN_CONFIG=${OPENVPN_CONFIG}
+  #     - OPENVPN_OPTS=${OPENVPN_OPTS}
+  #     - OPENVPN_PASSWORD=${VPN_PASS}
+  #     - OPENVPN_PROVIDER=${OPENVPN_PROVIDER}
+  #     - OPENVPN_USERNAME=${VPN_USER}
+  #     - PEER_DNS=false
+  #     - PEER_DNS_PIN_ROUTES=false
+  #     - PGID=${PGID}
+  #     - PUID=${PUID}
+  #     - TRANSMISSION_DOWNLOAD_DIR=${DATA_DIR_COMPLETE_RELATIVE}
+  #     - TRANSMISSION_INCOMPLETE_DIR=${DATA_DIR_INCOMPLETE_RELATIVE}
+  #     - TRANSMISSION_WEB_UI=flood-for-transmission
+  #     - TZ=${TZ}
+  #     - UFW_ALLOW_GW_NET=true
+  #     - UFW_DISABLE_IPTABLES_REJECT=true
+  #     - UFW_EXTRA_PORTS=6789,6881,8080,8112,9091,9910
+  #     - UMASK=${UMASK}
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: 10m
+  #   networks:
+  #     - media
+  #   command: [ "dumb-init", "/entrypoint.sh", "/etc/openvpn/start.sh" ]
+  #   volumes:
+  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${CONFIG_BASE_DIR}/transmission-openvpn:/config
+  #     - ${CONFIG_BASE_DIR}/transmission-openvpn/entrypoint.sh:/entrypoint.sh
+  #     - ${CONFIG_BASE_DIR}/transmission-openvpn/openvpn:/etc/openvpn/custom
+  #   ports:
+  #     # deluge
+  #     - 8112:8112
+  #     - 6881:6881
+  #     - 6881:6881/udp
+  #     - 9910:9910
+  #     # nzbget
+  #     - 6789:6789
+  #     # sabnzbd
+  #     - 8080:8080
+  #     #transmission
+  #     - 9091:9091
+  #   restart: unless-stopped
 
   unpackerr:
     image: golift/unpackerr
@@ -194,7 +311,8 @@ services:
       # - UN_WEBHOOK_0_TEMPLATE_PATH=
       # - UN_WEBHOOK_0_TIMEOUT=10s
       # - UN_WEBHOOK_0_URL=
-    network_mode: "service:transmission-openvpn"
+    networks:
+      - media
     security_opt:
       - no-new-privileges:true
     volumes:
