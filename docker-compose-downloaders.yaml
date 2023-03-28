@@ -52,7 +52,7 @@ services:
       - 8112:8112
       - 8118:8118
       - 58846:58846
-      - 58946:58946
+      - 58946:58946/udp
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
@@ -169,6 +169,21 @@ services:
       - 8080:8080
       - 8090:8090
       - 8119:8118
+      # deluge
+      # - 8112:8112
+      # - 6881:6881
+      # - 6881:6881/udp
+      # - 9910:9910
+      # nzbget
+      # - 6789:6789
+      # sabnzbd
+      # - 8080:8080
+      # - 8090:8090
+      # - 8119:8118
+      #transmission
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
@@ -176,6 +191,45 @@ services:
       - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
       - ${CONFIG_BASE_DIR}/sabnzbdvpn:/config
     restart: unless-stopped
+
+  # transmission:
+  #   image: lscr.io/linuxserver/transmission:latest
+  #   container_name: transmission
+  #   environment:
+  #     - DEBUG=true
+  #     - ENABLE_UFW=true
+  #     - GLOBAL_APPLY_PERMISSIONS=false
+  #     - HEALTH_CHECK_HOST=${HEALTH_CHECK_HOST}
+  #     - LOCAL_NETWORK=
+  #     - OPENVPN_CONFIG=${OPENVPN_CONFIG}
+  #     - OPENVPN_OPTS=${OPENVPN_OPTS}
+  #     - PASS=${VPN_PASS}
+  #     - OPENVPN_PROVIDER=${OPENVPN_PROVIDER}
+  #     - USER=${VPN_USER}
+  #     - PEER_DNS=false
+  #     - PEER_DNS_PIN_ROUTES=false
+  #     - PGID=${PGID}
+  #     - PUID=${PUID}
+  #     - TRANSMISSION_DOWNLOAD_DIR=${DATA_DIR_COMPLETE_RELATIVE}
+  #     - TRANSMISSION_INCOMPLETE_DIR=${DATA_DIR_INCOMPLETE_RELATIVE}
+  #     - TRANSMISSION_WEB_UI=flood-for-transmission
+  #     - TZ=${TZ}
+  #     - UFW_ALLOW_GW_NET=true
+  #     - UFW_DISABLE_IPTABLES_REJECT=true
+  #     - UFW_EXTRA_PORTS=6789,6881,8080,8112,9091,9910
+  #     - UMASK=${UMASK}
+  #   network_mode: "service:sabnzbdvpn"
+  #   volumes:
+  #     # - /path/to/data:/config
+  #     # - /path/to/downloads:/downloads
+  #     # - /path/to/watch/folder:/watch
+  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${CONFIG_BASE_DIR}/transmission-openvpn:/config
+  #     # - ${CONFIG_BASE_DIR}/transmission-openvpn/entrypoint.sh:/entrypoint.sh
+  #     # - ${CONFIG_BASE_DIR}/transmission-openvpn/openvpn:/etc/openvpn/custom
+  #   restart: unless-stopped
 
   # transmission-openvpn:
   #   image: haugene/transmission-openvpn
