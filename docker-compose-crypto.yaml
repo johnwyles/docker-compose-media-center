@@ -1,0 +1,53 @@
+# ||--------------------------------------------------------------------------------||
+# ||                              Crypto Applications                               ||
+# ||--------------------------------------------------------------------------------||
+
+version: "3.6"
+
+services:
+  rana:
+    image: rana:latest
+    container_name: rana
+    hostname: rana
+    environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    entrypoint: "/app/target/release/rana"
+    command: ${RANA_COMMAND} # -n=j0hnwyles,j0hnwyl3s -c 4
+    restart: unless-stopped
+
+  vanity-age:
+    image: vanity-age:latest
+    container_name: vanity-age
+    hostname: vanity-age
+    environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    entrypoint: /app/vanity-age
+    command: "${VANITY_AGE_COMMAND}" # '\d+j0hn\d?wyles.*'
+    restart: "no"
+
+networks:
+  media:
+    name: media
+    # external: true
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.bridge.host_binding_ipv4: "0.0.0.0"
+      com.docker.network.bridge.name: "media"
+      com.docker.network.driver.mtu: "1500"
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY_IP}
+          ip_range: ${IP_RANGE}
