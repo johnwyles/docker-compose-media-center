@@ -4,26 +4,27 @@
 version: "3.6"
 
 services:
-  notifiarr:
-    image: golift/notifiarr
-    container_name: notifiarr
-    environment:
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    networks:
-      - media
-    volumes:
-      - /var/run/utmp:/var/run/utmp
-      - ${CONFIG_BASE_DIR}/notifiarr/notifiarr.conf:/config/notifiarr.conf
-    ports:
-      - 5454:5454
-    restart: unless-stopped
+  # notifiarr:
+  #   image: golift/notifiarr
+  #   container_name: notifiarr
+  #   environment:
+  #     - PGID=${PGID}
+  #     - PUID=${PUID}
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - /var/run/utmp:/var/run/utmp
+  #     - ${CONFIG_BASE_DIR}/notifiarr/notifiarr.conf:/config/notifiarr.conf
+  #   ports:
+  #     - 5454:5454
+  #   restart: unless-stopped
 
   overseerr:
     image: lscr.io/linuxserver/overseerr:latest
     container_name: overseerr
+    hostname: overseerr
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
@@ -40,6 +41,7 @@ services:
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
+    hostname: plex
     environment:
       - PGID=${PGID}
       - PLEX_CLAIM=${PLEX_CLAIM}
@@ -65,22 +67,21 @@ services:
       - 32469:32469
       - 8324:8324
     restart: unless-stopped
-
-  tautulli:
-    image: lscr.io/linuxserver/tautulli:latest
-    container_name: tautulli
-    environment:
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    networks:
-      - media
-    volumes:
-      - ${CONFIG_BASE_DIR}/tautulli:/config
-    ports:
-      - 8181:8181
-    restart: unless-stopped
+  # tautulli:
+  #   image: lscr.io/linuxserver/tautulli:latest
+  #   container_name: tautulli
+  #   environment:
+  #     - PGID=${PGID}
+  #     - PUID=${PUID}
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - ${CONFIG_BASE_DIR}/tautulli:/config
+  #   ports:
+  #     - 8181:8181
+  #   restart: unless-stopped
 
 networks:
   media:

@@ -7,6 +7,30 @@
 version: "3.6"
 
 services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    hostname: searxng
+    environment:
+      - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
+    networks:
+      - media
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: 1
+    volumes:
+      - ${CONFIG_BASE_DIR}/searxng:/etc/searxng:rw
+    ports:
+      - 8082:8080
+
   syncthing:
     image: lscr.io/linuxserver/syncthing:latest
     container_name: syncthing
@@ -32,7 +56,7 @@ services:
   tailscale:
     image: tailscale/tailscale:latest
     container_name: tailscale
-    hostname: extropy-nas-tailscale
+    hostname: extropy-nas
     cap_add:
       - NET_ADMIN
       - NET_RAW
@@ -43,26 +67,25 @@ services:
       - PUID=${PUID}
       - TAILSCALE_HOSTNAME=${TAILSCALE_HOSTNAME:?err}
       - TAILSCALE_STATE_ARG=${TAILSCALE_STATE_ARG}
-      - TS_AUTH_KEY=${TS_AUTH_KEY:?err}
+      - TS_ACCEPT_DNS=${TS_ACCEPT_DNS}
+      - TS_AUTHKEY=${TS_AUTHKEY:?err}
+      - TS_DEST_IP=${TS_DEST_IP}
+      - TS_EXTRA_ARGS=${TS_EXTRA_ARGS}
+      - TS_KUBE_SECRET=${TS_KUBE_SECRET}
+      - TS_OUTBOUND_HTTP_PROXY_LISTEN=${TS_OUTBOUND_HTTP_PROXY_LISTEN}
+      - TS_ROUTES=${TS_ROUTES}
+      - TS_SOCKET=${TS_SOCKET}
+      - TS_SOCKS5_SERVER=${TS_SOCKS5_SERVER}
+      - TS_STATE_DIR=${TS_STATE_DIR}
+      - TS_TAILSCALED_EXTRA_ARGS=${TS_TAILSCALED_EXTRA_ARGS}
+      - TS_USERSPACE=${TS_USERSPACE}
       - TZ=${TZ}
       - UMASK=${UMASK}
-      # TODO: Add these
-      # TS_AUTH_KEY: a Tailscale auth key, i.e. what you'd pass to tailscale --authkey=
-      # TS_KUBE_SECRET: if running in Kubernetes, secret name where to store Tailscale state
-      # TS_DEST_IP: destination IP, if deploying Tailscale as a proxy
-      # TS_ROUTES: tailscale --advertise-routes=
-      # TS_ACCEPT_DNS: tailscale --accept-dns=
-      # TS_SOCKET: tailscale --socket=
-      # TS_EXTRA_ARGS: any other CLI flags for tailscale
-      # TS_USERSPACE: tailscaled --tun=userspace-networking
-      # TS_STATE_DIR: tailscaled --statedir=
-      # TS_SOCKS5_SERVER: set to an addr+port for the SOCKS5 proxy like :1055, which will be passed to tailscaled --socks5-server=:1055
-      # TS_OUTBOUND_HTTP_PROXY_LISTEN: set to an addr+port for the HTTP proxy like :1055, which will be passed to tailscaled --outbound-http-proxy-listen=:1055
-      # TS_TAILSCALED_EXTRA_ARGS: any other flags for tailscaled
     network_mode: host
     volumes:
-      - ${CONFIG_BASE_DIR}/tailscale:/var/lib
+      - ${CONFIG_BASE_DIR}/tailscale/varlib:/var/lib
       - /dev/net/tun:/dev/net/tun
+      - ${CONFIG_BASE_DIR}/tailscale/tmp:/tmp
     restart: unless-stopped
 
   watchtower:
