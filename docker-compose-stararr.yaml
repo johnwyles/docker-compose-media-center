@@ -7,6 +7,7 @@ services:
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
+    hostname: bazarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -25,6 +26,7 @@ services:
   lidarr:
     image: lscr.io/linuxserver/lidarr:latest
     container_name: lidarr
+    hostname: lidarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -44,6 +46,7 @@ services:
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
+    hostname: prowlarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -60,6 +63,7 @@ services:
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
+    hostname: radarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -79,6 +83,7 @@ services:
   readarr:
     image: lscr.io/linuxserver/readarr:develop
     container_name: readarr
+    hostname: readarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -98,6 +103,7 @@ services:
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
+    hostname: sonarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}

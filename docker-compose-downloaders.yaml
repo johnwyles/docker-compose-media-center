@@ -2,64 +2,85 @@
 # ||                            Downloading Applications                            ||
 # ||--------------------------------------------------------------------------------||
 version: "3.6"
-
 services:
-  # deluge:
-  #   image: lscr.io/linuxserver/deluge:latest
-  #   container_name: deluge
-  #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-  #     - DELUGE_LOGLEVEL=info
-  #     - UMASK=${UMASK}
-  #   network_mode: "service:transmission-openvpn"
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
-  #     - ${CONFIG_BASE_DIR}/deluge:/config
-  #   restart: unless-stopped
-
-  delugevpn:
-    container_name: delugevpn
-    image: binhex/arch-delugevpn
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    hostname: gluetun
     cap_add:
       - NET_ADMIN
     environment:
-      VPN_ENABLED: ${VPN_ENABLED}
-      VPN_USER: ${VPN_USER}
-      VPN_PASS: ${VPN_PASS}
-      VPN_PROV: ${VPN_PROV}
-      VPN_OPTIONS: ${VPN_OPTIONS}
-      STRICT_PORT_FORWARD: ${STRICT_PORT_FORWARD}
-      ENABLE_PRIVOXY: ${ENABLE_PRIVOXY}
-      LAN_NETWORK: ${LAN_NETWORK}
-      NAME_SERVERS: ${NAME_SERVERS}
-      VPN_CLIENT: ${VPN_CLIENT}
-      DELUGE_ENABLE_WEBUI_PASSWORD: ${DELUGE_ENABLE_WEBUI_PASSWORD}
-      DELUGE_DAEMON_LOG_LEVEL: ${DELUGE_DAEMON_LOG_LEVEL}
-      DELUGE_WEB_LOG_LEVEL: ${DELUGE_WEB_LOG_LEVEL}
-      ADDITIONAL_PORTS: ${ADDITIONAL_PORTS}
-      DEBUG: ${DEBUG}
-      UMASK: ${UMASK}
-      PUID: ${PUID}
-      PGID: ${PGID}
+      - VPN_SERVICE_PROVIDER=private internet access
+      - OPENVPN_USER=${VPN_USER}
+      - OPENVPN_PASSWORD=${VPN_PASS}
+      - SERVER_REGIONS=${SERVER_REGIONS}
     networks:
       - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/gluetun:/gluetun
     ports:
-      - 8112:8112
-      - 8118:8118
-      - 58846:58846
-      - 58946:58946/udp
+      - 9000:9000/tcp
+      - 7000:8000/tcp
+      - 8112:8112 # deluge
+      - 8080:8080 # sabnzbd
+    restart: unless-stopped
+
+  deluge:
+    image: lscr.io/linuxserver/deluge:latest
+    container_name: deluge
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DELUGE_LOGLEVEL=info
+      - UMASK=${UMASK}
+    network_mode: "service:gluetun"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
       - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
       - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
-      - ${CONFIG_BASE_DIR}/delugevpn:/config
+      - ${CONFIG_BASE_DIR}/deluge:/config
     restart: unless-stopped
+
+  # delugevpn:
+  #   container_name: delugevpn
+  #   image: binhex/arch-delugevpn
+  #   cap_add:
+  #     - NET_ADMIN
+  #   environment:
+  #     VPN_ENABLED: ${VPN_ENABLED}
+  #     VPN_USER: ${VPN_USER}
+  #     VPN_PASS: ${VPN_PASS}
+  #     VPN_PROV: ${VPN_PROV}
+  #     VPN_OPTIONS: ${VPN_OPTIONS}
+  #     STRICT_PORT_FORWARD: ${STRICT_PORT_FORWARD}
+  #     ENABLE_PRIVOXY: ${ENABLE_PRIVOXY}
+  #     LAN_NETWORK: ${LAN_NETWORK}
+  #     NAME_SERVERS: ${NAME_SERVERS}
+  #     VPN_CLIENT: ${VPN_CLIENT}
+  #     DELUGE_ENABLE_WEBUI_PASSWORD: ${DELUGE_ENABLE_WEBUI_PASSWORD}
+  #     DELUGE_DAEMON_LOG_LEVEL: ${DELUGE_DAEMON_LOG_LEVEL}
+  #     DELUGE_WEB_LOG_LEVEL: ${DELUGE_WEB_LOG_LEVEL}
+  #     ADDITIONAL_PORTS: ${ADDITIONAL_PORTS}
+  #     DEBUG: ${DEBUG}
+  #     UMASK: ${UMASK}
+  #     PUID: ${PUID}
+  #     PGID: ${PGID}
+  #   networks:
+  #     - media
+  #   ports:
+  #     - 8112:8112
+  #     - 8118:8118
+  #     - 58846:58846
+  #     - 58946:58946/udp
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${CONFIG_BASE_DIR}/delugevpn:/config
+  #   restart: unless-stopped
 
   # nzbget:
   #   image: lscr.io/linuxserver/nzbget:latest
@@ -88,6 +109,7 @@ services:
   # nzbgetvpn:
   #   image: jarlave/nzbgetvpn:2020112501
   #   container_name: nzbgetvpn
+  #   hostname: nzbgetvpn
   #   cap_add:
   #     - NET_ADMIN
   #   environment:
@@ -123,78 +145,80 @@ services:
   #     - 6789:6789
   #   restart: unless-stopped
 
-  # sabnzbd:
-  #   image: lscr.io/linuxserver/sabnzbd:latest
-  #   container_name: sabnzbd
-  #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-  #     - UMASK=${UMASK}
-  #   network_mode: "service:transmission-openvpn"
-  #   volumes:
-  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
-  #     - ${CONFIG_BASE_DIR}/sabnzbd:/config
-  #   restart: unless-stopped
-
-  sabnzbdvpn:
-    container_name: sabnzbdvpn
-    image: binhex/arch-sabnzbdvpn
-    cap_add:
-      - NET_ADMIN
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
     environment:
-      VPN_ENABLED: ${VPN_ENABLED}
-      VPN_USER: ${VPN_USER}
-      VPN_PASS: ${VPN_PASS}
-      VPN_PROV: ${VPN_PROV}
-      VPN_OPTIONS: ${VPN_OPTIONS}
-      STRICT_PORT_FORWARD: ${STRICT_PORT_FORWARD}
-      ENABLE_PRIVOXY: ${ENABLE_PRIVOXY}
-      LAN_NETWORK: ${LAN_NETWORK}
-      NAME_SERVERS: ${NAME_SERVERS}
-      VPN_CLIENT: ${VPN_CLIENT}
-      DELUGE_ENABLE_WEBUI_PASSWORD: ${DELUGE_ENABLE_WEBUI_PASSWORD}
-      DELUGE_DAEMON_LOG_LEVEL: ${DELUGE_DAEMON_LOG_LEVEL}
-      DELUGE_WEB_LOG_LEVEL: ${DELUGE_WEB_LOG_LEVEL}
-      ADDITIONAL_PORTS: ${ADDITIONAL_PORTS}
-      DEBUG: ${DEBUG}
-      UMASK: ${UMASK}
-      PUID: ${PUID}
-      PGID: ${PGID}
-    networks:
-      - media
-    ports:
-      - 8080:8080
-      - 8090:8090
-      - 8119:8118
-      # deluge
-      # - 8112:8112
-      # - 6881:6881
-      # - 6881:6881/udp
-      # - 9910:9910
-      # nzbget
-      # - 6789:6789
-      # sabnzbd
-      # - 8080:8080
-      # - 8090:8090
-      # - 8119:8118
-      #transmission
-      - 9091:9091
-      - 51413:51413
-      - 51413:51413/udp
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    network_mode: "service:gluetun"
     volumes:
-      - /etc/localtime:/etc/localtime:ro
       - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
       - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
       - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
-      - ${CONFIG_BASE_DIR}/sabnzbdvpn:/config
+      - ${CONFIG_BASE_DIR}/sabnzbd:/config
     restart: unless-stopped
+
+  # sabnzbdvpn:
+  #   image: binhex/arch-sabnzbdvpn
+  #   container_name: sabnzbdvpn
+  #   hostname: 
+  #   cap_add:
+  #     - NET_ADMIN
+  #   environment:
+  #     VPN_ENABLED: ${VPN_ENABLED}
+  #     VPN_USER: ${VPN_USER}
+  #     VPN_PASS: ${VPN_PASS}
+  #     VPN_PROV: ${VPN_PROV}
+  #     VPN_OPTIONS: ${VPN_OPTIONS}
+  #     STRICT_PORT_FORWARD: ${STRICT_PORT_FORWARD}
+  #     ENABLE_PRIVOXY: ${ENABLE_PRIVOXY}
+  #     LAN_NETWORK: ${LAN_NETWORK}
+  #     NAME_SERVERS: ${NAME_SERVERS}
+  #     VPN_CLIENT: ${VPN_CLIENT}
+  #     DELUGE_ENABLE_WEBUI_PASSWORD: ${DELUGE_ENABLE_WEBUI_PASSWORD}
+  #     DELUGE_DAEMON_LOG_LEVEL: ${DELUGE_DAEMON_LOG_LEVEL}
+  #     DELUGE_WEB_LOG_LEVEL: ${DELUGE_WEB_LOG_LEVEL}
+  #     ADDITIONAL_PORTS: ${ADDITIONAL_PORTS}
+  #     DEBUG: ${DEBUG}
+  #     UMASK: ${UMASK}
+  #     PUID: ${PUID}
+  #     PGID: ${PGID}
+  #   networks:
+  #     - media
+  #   ports:
+  #     - 8080:8080
+  #     - 8090:8090
+  #     - 8119:8118
+  #     # deluge
+  #     # - 8112:8112
+  #     # - 6881:6881
+  #     # - 6881:6881/udp
+  #     # - 9910:9910
+  #     # nzbget
+  #     # - 6789:6789
+  #     # sabnzbd
+  #     # - 8080:8080
+  #     # - 8090:8090
+  #     # - 8119:8118
+  #     #transmission
+  #     - 9091:9091
+  #     - 51413:51413
+  #     - 51413:51413/udp
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${CONFIG_BASE_DIR}/sabnzbdvpn:/config
+  #   restart: unless-stopped
 
   # transmission:
   #   image: lscr.io/linuxserver/transmission:latest
   #   container_name: transmission
+  #   hostname: transmission
   #   environment:
   #     - DEBUG=true
   #     - ENABLE_UFW=true

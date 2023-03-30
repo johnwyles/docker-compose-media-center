@@ -7,6 +7,30 @@
 version: "3.6"
 
 services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    hostname: searxng
+    environment:
+      - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
+    networks:
+      - media
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: 1
+    volumes:
+      - ${CONFIG_BASE_DIR}/searxng:/etc/searxng:rw
+    ports:
+      - 8082:8080
+
   syncthing:
     image: lscr.io/linuxserver/syncthing:latest
     container_name: syncthing
