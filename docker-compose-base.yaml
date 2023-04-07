@@ -68,25 +68,25 @@ services:
       - TAILSCALE_HOSTNAME=${TAILSCALE_HOSTNAME:?err}
       - TAILSCALE_STATE_ARG=${TAILSCALE_STATE_ARG}
       - TS_AUTH_KEY=${TS_AUTH_KEY:?err}
+      - TS_SOCKET=${TS_SOCKET}
+      - TS_STATE_DIR=${TS_STATE_DIR}
       - TZ=${TZ}
       - UMASK=${UMASK}
       # TODO: Add these
-      # TS_AUTH_KEY: a Tailscale auth key, i.e. what you'd pass to tailscale --authkey=
       # TS_KUBE_SECRET: if running in Kubernetes, secret name where to store Tailscale state
       # TS_DEST_IP: destination IP, if deploying Tailscale as a proxy
       # TS_ROUTES: tailscale --advertise-routes=
       # TS_ACCEPT_DNS: tailscale --accept-dns=
-      # TS_SOCKET: tailscale --socket=
       # TS_EXTRA_ARGS: any other CLI flags for tailscale
       # TS_USERSPACE: tailscaled --tun=userspace-networking
-      # TS_STATE_DIR: tailscaled --statedir=
       # TS_SOCKS5_SERVER: set to an addr+port for the SOCKS5 proxy like :1055, which will be passed to tailscaled --socks5-server=:1055
       # TS_OUTBOUND_HTTP_PROXY_LISTEN: set to an addr+port for the HTTP proxy like :1055, which will be passed to tailscaled --outbound-http-proxy-listen=:1055
       # TS_TAILSCALED_EXTRA_ARGS: any other flags for tailscaled
     network_mode: host
     volumes:
-      - ${CONFIG_BASE_DIR}/tailscale:/var/lib
+      - ${CONFIG_BASE_DIR}/tailscale/varlib:/var/lib
       - /dev/net/tun:/dev/net/tun
+      - ${CONFIG_BASE_DIR}/tailscale/tmp:/tmp
     restart: unless-stopped
 
   watchtower:
