@@ -56,7 +56,7 @@ services:
   tailscale:
     image: tailscale/tailscale:latest
     container_name: tailscale
-    hostname: extropy-nas-tailscale
+    hostname: extropy-nas
     cap_add:
       - NET_ADMIN
       - NET_RAW
@@ -70,6 +70,7 @@ services:
       - TS_AUTH_KEY=${TS_AUTH_KEY:?err}
       - TS_SOCKET=${TS_SOCKET}
       - TS_STATE_DIR=${TS_STATE_DIR}
+      - TS_EXTRA_ARGS=${TS_EXTRA_ARGS}
       - TZ=${TZ}
       - UMASK=${UMASK}
       # TODO: Add these
