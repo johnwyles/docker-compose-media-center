@@ -122,6 +122,7 @@ run the following:
 ```shell
 mkdir -p ${CONFIG_BASE_DIR}/bazarr
 mkdir -p ${CONFIG_BASE_DIR}/deluge
+mkdir -p ${CONFIG_BASE_DIR}/gluetun
 mkdir -p ${CONFIG_BASE_DIR}/lidarr
 mkdir -p ${CONFIG_BASE_DIR}/notifiarr
 mkdir -p ${CONFIG_BASE_DIR}/nzbget
