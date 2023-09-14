@@ -24,14 +24,15 @@ at-home NAS.
 
 - [Deluge](https://github.com/linuxserver/docker-deluge): Deluge for torrent
   downloads.
+- [gluetun](https://github.com/qdm12/gluetun): **NOTE:** This is the
+  *base* container for the VPN connection and killswitch which all other
+  containers in this Portainer stack are routed.
 - [NZBGet](https://github.com/linuxserver/docker-nzbget): NZBGet for Usenet
   downloads.
 - [SABnzbd](https://github.com/linuxserver/docker-sabnzbd) SABnzbd for Usenet
   downloads.
 - [Transmission-OpenVPN](https://github.com/haugene/docker-transmission-openvpn):
-  Transmission with OpenVPN for torrent downloads. **NOTE:** This is also the
-  *base* container for the VPN connection and killswitch which all other
-  containers in this Portainer stack are routed.
+  Transmission with OpenVPN for torrent downloads.
 - [Unpackerr](https://hub.docker.com/r/golift/unpackerr): Unpackerr for any
   unpacking in post-processing after download.
 
