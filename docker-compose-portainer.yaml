@@ -2,7 +2,7 @@ version: "3.6"
 
 services:
   portainer:
-    image: portainer/portainer:latest
+    image: portainer/portainer-ce:latest
     container_name: portainer
     hostname: portainer
     environment:
