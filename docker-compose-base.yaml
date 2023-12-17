@@ -84,7 +84,9 @@ services:
     network_mode: host
     volumes:
       - ${CONFIG_BASE_DIR}/tailscale/varlib:/var/lib
+      - ${CONFIG_BASE_DIR}/tailscale/varlib:/var/lib
       - /dev/net/tun:/dev/net/tun
+      - ${CONFIG_BASE_DIR}/tailscale/tmp:/tmp
       - ${CONFIG_BASE_DIR}/tailscale/tmp:/tmp
     restart: unless-stopped
 
