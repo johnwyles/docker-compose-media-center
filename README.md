@@ -124,25 +124,34 @@ run the following:
 
 ```shell
 mkdir -p ${CONFIG_BASE_DIR}/bazarr
+mkdir -p ${CONFIG_BASE_DIR}/caddy
 mkdir -p ${CONFIG_BASE_DIR}/deluge
+# mkdir -p ${CONFIG_BASE_DIR}/delugevpn
 mkdir -p ${CONFIG_BASE_DIR}/gluetun
+mkdir -p ${CONFIG_BASE_DIR}/jellyfin
+mkdir -p ${CONFIG_BASE_DIR}/jellyseerr
 mkdir -p ${CONFIG_BASE_DIR}/lidarr
-# mkdir -p ${CONFIG_BASE_DIR}/notifiarr
+mkdir -p ${CONFIG_BASE_DIR}/notifiarr
 # mkdir -p ${CONFIG_BASE_DIR}/nzbget
 mkdir -p ${CONFIG_BASE_DIR}/overseerr
 mkdir -p ${CONFIG_BASE_DIR}/plex
+mkdir -p ${CONFIG_BASE_DIR}/plexmetamanager
 mkdir -p ${CONFIG_BASE_DIR}/portainer
 mkdir -p ${CONFIG_BASE_DIR}/prowlarr
 mkdir -p ${CONFIG_BASE_DIR}/radarr
+# mkdir -p ${CONFIG_BASE_DIR}/rana
 mkdir -p ${CONFIG_BASE_DIR}/readarr
 mkdir -p ${CONFIG_BASE_DIR}/sabnzbd
+mkdir -p ${CONFIG_BASE_DIR}/sabnzbdvpn
 mkdir -p ${CONFIG_BASE_DIR}/sonarr
 mkdir -p ${CONFIG_BASE_DIR}/syncthing
 mkdir -p ${CONFIG_BASE_DIR}/tailscale
 mkdir -p ${CONFIG_BASE_DIR}/tautulli
-mkdir -p ${CONFIG_BASE_DIR}/transmission-openvpn
+# mkdir -p ${CONFIG_BASE_DIR}/transmission
+# mkdir -p ${CONFIG_BASE_DIR}/transmission-openvpn
 mkdir -p ${CONFIG_BASE_DIR}/unpackerr
 mkdir -p ${CONFIG_BASE_DIR}/watchtower
+# mkdir -p ${CONFIG_BASE_DIR}/vanity-age
 ```
 
 ## Environment Variables
@@ -160,14 +169,14 @@ variables and their purpose:
 - `CONFIG_BASE_DIR`: The base directory where each of the containers will have
   their configurations persistently stored between reboots, restarts, etc. (e.g.
   `/volume1/docker`... and will serve the container the directory (e.g.
-  *Transmission OpenVPN* => `/volume1/docker`/transmission-openvpn, *Plex* =>
+  *Deluge* => `/volume1/docker`/deluge, *Plex* =>
   `/volume1/docker`/plex, *Tailscale* => `/volume1/docker`/tailscale, etc.) =>
-  (e.g. Transmission OpenVPN => `transmission-openvpn`, Plex => `plex`,
+  (e.g. Deluge => `deluge`, Plex => `plex`,
   Tailscale => `tailscale`, etc.)
 - `CONFIG_DATA_DIR`: The directory for each of the containers to store their
   data persistently stored between reboots, restarts, etc. (e.g.
   `/volume1/Data`... will serve the data directories for e.g. `complete`,
-  `incomplete`, and `watch` for Transmission)
+  `incomplete`, and `watch` for Deluge)
 - `DATA_DIR_COMPLETE_LOCAL`: The directory to keep completely downloaded
   files locally on disk (i.e. `/volume1/data/complete`)
 - `DATA_DIR_COMPLETE_RELATIVE`: The directory to keep completely downloaded
@@ -205,14 +214,20 @@ variables and their purpose:
   *relative* to the container (i.e. **not** the actual location of the files on
   disk e.g. `/music` => `${MUSIC_DIR_LOCAL}` e.g. `/music` => `/volume1/music`)
 - `NAME_SERVERS`: The DNS servers to use when the VPN is connected
-- `NZBGET_WEBUI_PASSWORD`: NZBGet Password for the Web UI
-- `NZBGET_WEBUI_USERNAME=admin`: NZBGet Username for the Web UI
+- ~~`NZBGET_WEBUI_PASSWORD`: NZBGet Password for the Web UI~~
+- ~~`NZBGET_WEBUI_USERNAME=admin`: NZBGet Username for the Web UI~~
 - `OPENVPN_CONFIG`: Transmission OpenVPN configuration file(s) to use (e.g.
   `us_west.ovpn` => `us_west` or to use more than one file:
   `us_west,us_california,us_east`)
 - `OPENVPN_OPTS`: Transmission OpenVPN optional arguments
-- `PLEX_CLAIM=`: The Plex claim ID received from <https://plex.tv/claim> when
+- `OPENVPN_PROVIDER`: Transmission OpenVPN Provider (e.g. `PIA` for Private Internet Access VPN, etc.)
+- `PLEX_CLAIM`: The Plex claim ID received from <https://plex.tv/claim> when
   first starting the Plex service
+- `PMM_PLEX_TOKEN`: The Plex claim ID from above but without the `claim-` prefix
+- `PMM_PLEX_URL`: The internal Docker URL for the plex container for use by Plex
+  Meta Manager (e.g. (and probably should not change) `http://plex:32400`)
+- `PRIVATE_INTERNET_ACCESS_VPN_PORT_FORWARDING`: Gluetun VPN killswitch setting for port forward with Private Internet Access (i.e. `on` or `off`)
+- `SERVER_REGIONS`: Gluetun VPN killswitch setting for the regions to use (e.g. `Switzerland,Estonia,Iceland,Panama,Romania`)
 - `SUBNET`: The subnet for the Docker Compose environment (e.g. `172.16.0.0/16`)
 - `TAILSCALE_HOSTNAME`: The hostname of this tailscale instance (e.g.
   `my-nas-server`)
@@ -231,10 +246,11 @@ variables and their purpose:
 - `UN_READARR_0_API_KEY`: Readarr API key
 - `UN_SONARR_0_API_KEY`: Sonarr API key
 - `VPN_PASS`: VPN password for your VPN provider
+- `VPN_SERVICE_PROVIDER`: Gluetun VPN service provider (e.g. "private internet access` for Private Internet Access VPN)
 - `VPN_USER`: VPN username for your VPN provider
 - `WATCHTOWER_NOTIFICATION_URL`: (optional) Watchtower Webhook Notification URL
 
-## Transmission OpenVPN Setup
+## TODO: CHANGE THIS TO GLUETUN INSTUCTIONS - Transmission OpenVPN Setup
 
 Even if you are not using Transmission for your torrent download client (I
 personally use Deluge) I found the container comes up much faster than the
@@ -254,52 +270,3 @@ pushd ${CONFIG_BASE_DIR}/transmission-openvpn/
   unzip openvpn.zip
 popd
 ```
-
-### IMPORTANT NOTE
-
-You should know for this project I believe because I am running an older kernel
-on my host OS I am getting the following error:
-
-```shell
-ERROR: problem running ufw-init
-iptables v1.8.7 (nf_tables): Could not fetch rule set generation id: Invalid argument`iptables v1.8.7 (nf_tables): Could not fetch rule set
-generation id: Invalid argument"`
-```
-
-Therefore,
-as [suggested in this GitHub issue](https://github.com/P0cL4bs/wifipumpkin3/issues/140#issuecomment-1294201623)
-I have added the following entrypoint script:
-
-```shell
-# NOTE: This is for Private Internet Access customers only but the same general
-# principle will apply when you find your OpenVPN `.ovpn` files:
-pushd ${CONFIG_BASE_DIR}/transmission-openvpn/
-  # This is needed because I am rnning on an old kernel
-  tee -a entrypoint.sh<<EOF
-#!/bin/sh
-update-alternatives --set iptables /usr/sbin/iptables-legacy
-exec "\$@"
-EOF
-  chmod +x entrypoint.sh
-popd
-```
-
-For this addition in the `docker-compose-downloaders.yaml` file, as you will
-find, I have added the one line:
-
-```docker-compose
-    command: [ "dumb-init", "/entrypoint.sh", "/etc/openvpn/start.sh" ]
-```
-
-As well as the following mounted volume:
-
-```docker-compose
-    volumes:
-    ...
-      - ${CONFIG_BASE_DIR}/transmission-openvpn/entrypoint.sh:/entrypoint.sh`
-    ...
-```
-
-**This means you will need to add the aformentioned IMPORTANT NOTE steps I have
-added just above here if you want this to work.** It should work just as fine
-but will be running an older version of `iptables` (i.e. `iptables-legacy`).
