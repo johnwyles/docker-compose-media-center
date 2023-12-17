@@ -4,6 +4,46 @@
 version: "3.6"
 
 services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    volumes:
+      - ${BOOKS_DIR_LOCAL}:${BOOKS_DIR_RELATIVE}
+      - ${CONFIG_BASE_DIR}/jellyfin:/config
+      - ${MOVIES_DIR_LOCAL}:${MOVIES_DIR_RELATIVE}
+      - ${MUSIC_DIR_LOCAL}:${MUSIC_DIR_RELATIVE}
+      - ${TV_DIR_LOCAL}:${TV_DIR_RELATIVE}
+    ports:
+      - 8096:8096
+      - 8920:8920
+      - 7359:7359/udp
+      # - 1900:1900/udp
+    restart: unless-stopped
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/jellyseerr:/app/config
+    ports:
+      - 5056:5055
+    restart: unless-stopped
+
   notifiarr:
     image: golift/notifiarr
     container_name: notifiarr
@@ -24,6 +64,7 @@ services:
   overseerr:
     image: lscr.io/linuxserver/overseerr:latest
     container_name: overseerr
+    hostname: overseerr
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
@@ -40,6 +81,7 @@ services:
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
+    hostname: plex
     environment:
       - PGID=${PGID}
       - PLEX_CLAIM=${PLEX_CLAIM}
@@ -81,6 +123,7 @@ services:
     ports:
       - 8181:8181
     restart: unless-stopped
+
 networks:
   media:
     name: media
