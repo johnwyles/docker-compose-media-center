@@ -12,27 +12,26 @@ at-home NAS.
   managing the remaining "Stacks" (docker-compose files).
 
 ### `docker-compose-base.yml`
-
-- [Syncthing](https://github.com/linuxserver/docker-syncthing) Syncthing for
+- [Gluetun](https://github.com/qdm12/gluetun): Utility for a base VPN killswitch
+  container that the downloading containers filter through when downloading.
+- [Syncthing](https://github.com/linuxserver/docker-syncthing): Utility for
   syncing files across machines.
-- [Tailscale](https://hub.docker.com/r/tailscale/tailscale) Tailscale for VPN to
+- [Tailscale](https://hub.docker.com/r/tailscale/tailscale): Tailscale for VPN to
   home network and for sharing services and files.
-- [Watchtower](https://github.com/containrrr/watchtower) Watchtower for watching
+- [Watchtower](https://github.com/containrrr/watchtower): Watchtower for watching
   updates to docker images and pulling them down.
 
 ### `docker-compose-downloaders.yml`
 
 - [Deluge](https://github.com/linuxserver/docker-deluge): Deluge for torrent
   downloads.
-- [gluetun](https://github.com/qdm12/gluetun): **NOTE:** This is the
-  *base* container for the VPN connection and killswitch which all other
-  containers in this Portainer stack are routed.
 - [NZBGet](https://github.com/linuxserver/docker-nzbget): NZBGet for Usenet
   downloads.
 - [SABnzbd](https://github.com/linuxserver/docker-sabnzbd) SABnzbd for Usenet
   downloads.
 - [Transmission-OpenVPN](https://github.com/haugene/docker-transmission-openvpn):
-  Transmission with OpenVPN for torrent downloads.
+  Transmission with OpenVPN for torrent downloads which includes a VPN killswitch
+  to stop downloading on loss of a VPN connection.
 - [Unpackerr](https://hub.docker.com/r/golift/unpackerr): Unpackerr for any
   unpacking in post-processing after download.
 
@@ -50,15 +49,18 @@ at-home NAS.
   and shows.
 
 ### `docker-compose-plex.yml`
-
-- [Plex](https://github.com/linuxserver/docker-plex): Plex nedia center for
+- [Jellyfin](https://github.com/linuxserver/docker-jellyfin): Jellyfin media
+  center for viewing and playing all of your media.
+- [Jellyseerr](https://hub.docker.com/r/fallenbagel/jellyseerr): Jellyseerr
+  (Overseerr fork) for browsing and discovering of new media.
+- [Notifiarr](https://hub.docker.com/r/golift/notifiarr): Notifiarr for Discord
+  and Webhooks.
+- [Plex](https://github.com/linuxserver/docker-plex): Plex media center for
   viewing and playing all of your media.
 - [Tautulli](https://github.com/linuxserver/docker-tautulli): Tautulli for Plex
   statistics and monitoring.
 - [Overseerr](https://github.com/linuxserver/docker-overseerr): Overseer for
   browsing and discovering of new media.
-- [Notifiarr](https://hub.docker.com/r/golift/notifiarr): Notifiarr for Discord
-  and Webhooks.
 
 ## Installation and Setup
 
