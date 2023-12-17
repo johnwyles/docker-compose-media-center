@@ -24,7 +24,6 @@ services:
   overseerr:
     image: lscr.io/linuxserver/overseerr:latest
     container_name: overseerr
-    hostname: overseerr
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
@@ -41,7 +40,6 @@ services:
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
-    hostname: plex
     environment:
       - PGID=${PGID}
       - PLEX_CLAIM=${PLEX_CLAIM}
@@ -55,7 +53,7 @@ services:
       - ${BOOKS_DIR_LOCAL}:${BOOKS_DIR_RELATIVE}
       - ${CONFIG_BASE_DIR}/plex/config:/config
       - ${MOVIES_DIR_LOCAL}:${MOVIES_DIR_RELATIVE}
-      - /volume1/Music:/music
+      - ${MUSIC_DIR_LOCAL}:${MUSIC_DIR_RELATIVE}
       - ${TV_DIR_LOCAL}:${TV_DIR_RELATIVE}
     ports:
       - 3005:3005
@@ -67,6 +65,21 @@ services:
       - 32469:32469
       - 8324:8324
     restart: unless-stopped
+
+  #plexmetamanager:
+  #  image: meisnate12/plex-meta-manager:latest
+  #  container_name: plexmetamanager
+  #  environment:
+  #    - PGID=${PGID}
+  #    - PMM_PLEX_TOKEN=${PMM_PLEX_TOKEN}
+  #    - PMM_PLEX_URL=${PMM_PLEX_URL}
+  #    - PUID=${PUID}
+  #    - UMASK=${UMASK}
+  #  networks:
+  #    - media
+  #  volumes:
+  #    - ${CONFIG_BASE_DIR}/plexmetamanager:/config
+  #  restart: unless-stopped
   # tautulli:
   #   image: lscr.io/linuxserver/tautulli:latest
   #   container_name: tautulli
@@ -83,6 +96,21 @@ services:
   #     - 8181:8181
   #   restart: unless-stopped
 
+  # tautulli:
+  #   image: lscr.io/linuxserver/tautulli:latest
+  #   container_name: tautulli
+  #   environment:
+  #     - PGID=${PGID}
+  #     - PUID=${PUID}
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - ${CONFIG_BASE_DIR}/tautulli:/config
+  #   ports:
+  #     - 8181:8181
+  #   restart: unless-stopped
 networks:
   media:
     name: media

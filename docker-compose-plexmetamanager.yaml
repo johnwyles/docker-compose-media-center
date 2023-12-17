@@ -1,0 +1,40 @@
+# ||--------------------------------------------------------------------------------||
+# ||                                Plex Meta Manager                               ||
+# ||--------------------------------------------------------------------------------||
+version: "3.6"
+
+services:
+  plexmetamanager:
+    #image: meisnate12/plex-meta-manager:latest
+    image: lscr.io/linuxserver/plex-meta-manager:latest
+    container_name: plexmetamanager
+    environment:
+      - PGID=${PGID}
+      - PMM_PLEX_TOKEN=${PMM_PLEX_TOKEN}
+      - PMM_PLEX_URL=${PMM_PLEX_URL}
+      - PMM_RUN=True
+      - PMM_TIME=
+      - PUID=${PUID}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/plexmetamanager:/config
+    restart: "no"
+
+networks:
+  media:
+    name: media
+    external: true
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.bridge.host_binding_ipv4: "0.0.0.0"
+      com.docker.network.bridge.name: "media"
+      com.docker.network.driver.mtu: "1500"
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY_IP}
+          ip_range: ${IP_RANGE}
