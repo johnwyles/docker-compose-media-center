@@ -84,9 +84,7 @@ services:
     network_mode: host
     volumes:
       - ${CONFIG_BASE_DIR}/tailscale/varlib:/var/lib
-      - ${CONFIG_BASE_DIR}/tailscale/varlib:/var/lib
       - /dev/net/tun:/dev/net/tun
-      - ${CONFIG_BASE_DIR}/tailscale/tmp:/tmp
       - ${CONFIG_BASE_DIR}/tailscale/tmp:/tmp
     restart: unless-stopped
 
@@ -101,10 +99,12 @@ services:
       - UMASK=${UMASK}
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_INCLUDE_RESTARTING=true
-      - WATCHTOWER_LABEL_ENABLE=true
+      - WATCHTOWER_INCLUDE_STOPPED=true
+      - WATCHTOWER_LABEL_ENABLE=false
       - WATCHTOWER_NOTIFICATION_REPORT=true
       - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_NOTIFICATION_URL}
-      - WATCHTOWER_POLL_INTERVAL=21600
+      - WATCHTOWER_POLL_INTERVAL=${WATCHTOWER_POLL_INTERVAL}
+      - WATCHTOWER_REMOVE_VOLUMES=true
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     networks:

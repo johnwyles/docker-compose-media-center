@@ -12,6 +12,7 @@ at-home NAS.
   managing the remaining "Stacks" (docker-compose files).
 
 ### `docker-compose-base.yml`
+
 - [Gluetun](https://github.com/qdm12/gluetun): Utility for a base VPN killswitch
   container that the downloading containers filter through when downloading.
 - [Syncthing](https://github.com/linuxserver/docker-syncthing): Utility for
@@ -49,6 +50,7 @@ at-home NAS.
   and shows.
 
 ### `docker-compose-plex.yml`
+
 - [Jellyfin](https://github.com/linuxserver/docker-jellyfin): Jellyfin media
   center for viewing and playing all of your media.
 - [Jellyseerr](https://hub.docker.com/r/fallenbagel/jellyseerr): Jellyseerr
@@ -251,6 +253,7 @@ variables and their purpose:
 - `VPN_SERVICE_PROVIDER`: Gluetun VPN service provider (e.g. "private internet access` for Private Internet Access VPN)
 - `VPN_USER`: VPN username for your VPN provider
 - `WATCHTOWER_NOTIFICATION_URL`: (optional) Watchtower Webhook Notification URL
+- `WATCHTOWER_POLL_INTERVAL`: Interval for Watchtower to check for new container images (e.g. 21600 ("6 hours"))
 
 ## TODO: CHANGE THIS TO GLUETUN INSTUCTIONS - Transmission OpenVPN Setup
 
