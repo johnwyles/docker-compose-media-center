@@ -107,7 +107,8 @@ You **must** complete these steps in this README *before* moving on to the next.
   - `docker compose --file docker-compose-stararr.yml --env-file .env up --detach`
   - `docker compose --file docker-compose-plex.yml --env-file .env up --detach`
 
-- Lastly to setup PlexMetaManager you'll want to add a cron entry that works for you with:
+- Lastly to setup PlexMetaManager you'll want to add a cron entry you run
+periodically with:
   - `docker-compose --file docker-compose-plexmetamanager.yaml --env-file variables.env up plexmetamanager`
 
 ## Directory Structure
