@@ -70,19 +70,19 @@ at-home NAS.
 
 2. Create a `media` network with:
 
-```docker-compose
-  docker network create \
-    --driver=bridge \
-    --gateway=172.16.0.1 \
-    --ip-range=172.16.0.0/24 \
-    --subnet=172.16.0.0/16 \
-    -o "com.docker.network.bridge.enable_icc"="true" \
-    -o "com.docker.network.bridge.enable_ip_masquerade"="true" \
-    -o "com.docker.network.bridge.host_binding_ipv4"="0.0.0.0" \
-    -o "com.docker.network.bridge.name"="media" \
-    -o "com.docker.network.driver.mtu"="1500" \
-    media
-```
+  ```shell
+    docker network create \
+      --driver=bridge \
+      --gateway=172.16.0.1 \
+      --ip-range=172.16.0.0/24 \
+      --subnet=172.16.0.0/16 \
+      -o "com.docker.network.bridge.enable_icc"="true" \
+      -o "com.docker.network.bridge.enable_ip_masquerade"="true" \
+      -o "com.docker.network.bridge.host_binding_ipv4"="0.0.0.0" \
+      -o "com.docker.network.bridge.name"="media" \
+      -o "com.docker.network.driver.mtu"="1500" \
+      media
+  ```
 
 3. Edit and move the file `environment_variables.env.example` saving it to the
 file to `.env` substituting with values you have after starting and setting up
@@ -91,12 +91,13 @@ sections:
 
 - [Directory Structure](#directory-structure),
 - [Environment Variables](#environment-variables)
-- [Transmission OpenVPN Setup](#transmission-openvpn-setup)
 
-You **must** complete these steps in this README *before* moving on to the next.
+  You **must** complete these steps in this README *before* moving on to the next.
 
-4. Run these `docker compose` commands order (**Note:** there are no
-  `depends_on`):
+4. Run these `docker compose` commands in order (**Note:** there are no
+  `depends_on` although internally the `docker-compose-downloaders.yml` file
+  has containers which are interdependent (i.e. `sabnzbd` and `deluge` use
+  the `gluetun` network service to enable the VPN killswitch) ):
 
 - First things first so we get the Portainer instance going:
   - `docker compose --file docker-compose-portainer.yaml --env-file .env up --detach`
