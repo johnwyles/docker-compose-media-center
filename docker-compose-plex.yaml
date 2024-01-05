@@ -47,6 +47,7 @@ services:
   notifiarr:
     image: golift/notifiarr
     container_name: notifiarr
+    hostname: notifiarr
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
@@ -96,6 +97,7 @@ services:
       - ${CONFIG_BASE_DIR}/plex/config:/config
       - ${MOVIES_DIR_LOCAL}:${MOVIES_DIR_RELATIVE}
       - ${MUSIC_DIR_LOCAL}:${MUSIC_DIR_RELATIVE}
+      - ${PERSONAL_DIR_LOCAL}:${PERSONAL_DIR_RELATIVE}
       - ${TV_DIR_LOCAL}:${TV_DIR_RELATIVE}
     ports:
       - 3005:3005

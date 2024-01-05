@@ -227,6 +227,11 @@ variables and their purpose:
   `us_west,us_california,us_east`)
 - `OPENVPN_OPTS`: Transmission OpenVPN optional arguments
 - `OPENVPN_PROVIDER`: Transmission OpenVPN Provider (e.g. `PIA` for Private Internet Access VPN, etc.)
+- `PERSONAL_DIR_LOCAL`: The directory where Personal videos files that are organized
+  locally on disk (i.e. `/volume1/personal/videos`)
+- `PERSONAL_DIR_RELATIVE`: The directory where Personal videos files that are organized
+  *relative* to the container (i.e. **not** the actual location of the files on
+  disk e.g. `/personal` => `${PERSONAL_DIR_LOCAL}` e.g. `/personal` => `/volume1/personal/videos`)
 - `PLEX_CLAIM`: The Plex claim ID received from <https://plex.tv/claim> when
   first starting the Plex service
 - `PMM_PLEX_TOKEN`: The Plex claim ID from above but without the `claim-` prefix
