@@ -225,7 +225,7 @@ variables and their purpose:
 - `OPENVPN_CONFIG`: Transmission OpenVPN configuration file(s) to use (e.g.
   `us_west.ovpn` => `us_west` or to use more than one file:
   `us_west,us_california,us_east`)
-- `OPENVPN_OPTS`: Transmission OpenVPN optional arguments
+- `OPENVPN_OPTS`: Transmission OpenVPN optional arguments (default: null)
 - `OPENVPN_PROVIDER`: Transmission OpenVPN Provider (e.g. `PIA` for Private Internet Access VPN, etc.)
 - `PERSONAL_DIR_LOCAL`: The directory where Personal videos files that are organized
   locally on disk (i.e. `/volume1/personal/videos`)
@@ -238,14 +238,27 @@ variables and their purpose:
 - `PMM_PLEX_URL`: The internal Docker URL for the plex container for use by Plex
   Meta Manager (e.g. (and probably should not change) `http://plex:32400`)
 - `PRIVATE_INTERNET_ACCESS_VPN_PORT_FORWARDING`: Gluetun VPN killswitch setting for port forward with Private Internet Access (i.e. `on` or `off`)
-- `SERVER_REGIONS`: Gluetun VPN killswitch setting for the regions to use (e.g. `Switzerland,Estonia,Iceland,Panama,Romania`)
+- `SERVER_COUNTRIES`: Gluetun VPN killswitch setting for the regions to use (e.g. `Switzerland,Estonia,Iceland,Panama,Romania`)
 - `SUBNET`: The subnet for the Docker Compose environment (e.g. `172.16.0.0/16`)
 - `TAILSCALE_HOSTNAME`: The hostname of this tailscale instance (e.g.
   `my-nas-server`)
 - `TAILSCALE_STATE_ARG`: The Tailscale argument for the state argument variable
   (e.g. `"mem:"`)
+- `TRANSMISSION_PASS`: The default password to set for Tranmission account (default: `admin`)
+- `TRANSMISSION_USER`: The account for access to Transmission (default: `admin`)
+- `TS_ACCEPT_DNS`: Tailscale setting for DNS entries (default: `true`)
 - `TS_AUTH_KEY`: The Tailscale authorization key from
   [Tailscale.com > Settings > Personal Settings > Keys](https://login.tailscale.com/admin/settings/keys)
+- `TS_DEST_IP`: Tailscale setting for target IP (default: null)
+- `TS_EXTRA_ARGS`: Extra arguments to pass to `tailscale up` (Recommended: `="--reset --advertise-exit-node --ssh"`)
+- `TS_KUBE_SECRET`: Kubernetes secret if you are in a K8S cluster
+- `TS_OUTBOUND_HTTP_PROXY_LISTEN`: Proxy settings if you have outbound proxy settings (default: null)
+- `TS_ROUTES`: Tailscale routing (default: null)
+- `TS_SOCKET`: Socket file for `tailscaled` (default: `/tmp/tailscaled.sock`)
+- `TS_TAILSCALED_EXTRA_ARGS`: Extra arguments to pass to start of `tailscaled` (default: null)
+- `TS_USERSPACE`: Userspace setting for Tailscale (default: null)
+- `TS_SOCKS5_SERVER`: SOCKS5 settings (default: null)
+- `TS_STATE_DIR`: Directory for tailscale storage state directory (default: `/var/lib/tailscale`)
 - `TV_DIR_LOCAL`: The directory to keep TV show files that are organized
   locally on disk (i.e. `/volume1/tv`)
 - `TV_DIR_RELATIVE`: The directory to keep TV show files that are organized
@@ -257,10 +270,11 @@ variables and their purpose:
 - `UN_READARR_0_API_KEY`: Readarr API key
 - `UN_SONARR_0_API_KEY`: Sonarr API key
 - `VPN_PASS`: VPN password for your VPN provider
-- `VPN_SERVICE_PROVIDER`: Gluetun VPN service provider (e.g. "private internet access` for Private Internet Access VPN)
+- `VPN_SERVICE_PROVIDER`: Gluetun VPN service provider (e.g. `private internet access` for Private Internet Access VPN, `nordvpn` for NordVPN, etc.)
 - `VPN_USER`: VPN username for your VPN provider
 - `WATCHTOWER_NOTIFICATION_URL`: (optional) Watchtower Webhook Notification URL
 - `WATCHTOWER_POLL_INTERVAL`: Interval for Watchtower to check for new container images (e.g. 21600 ("6 hours"))
+- `WIREGUARD_PRIVATE_KEY`: Gluetun wireguard private key setting (Author note: I do regret if you have to go through setting this arduous process... Details here (for NordVPN at least): [Getting NordVPN WireGuard details](https://gist.github.com/bluewalk/7b3db071c488c82c604baf76a42eaad3)
 
 ## TODO: CHANGE THIS TO GLUETUN INSTUCTIONS - Transmission OpenVPN Setup
 

@@ -1,7 +1,8 @@
 # ||--------------------------------------------------------------------------------||
 # ||                            Downloading Applications                            ||
 # ||--------------------------------------------------------------------------------||
-version: "3.6"
+version: "3.7"
+
 services:
   gluetun:
     image: qmcgaw/gluetun
@@ -10,19 +11,26 @@ services:
     cap_add:
       - NET_ADMIN
     environment:
-      - VPN_SERVICE_PROVIDER=private internet access
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
       - OPENVPN_USER=${VPN_USER}
       - OPENVPN_PASSWORD=${VPN_PASS}
-      - SERVER_REGIONS=${SERVER_REGIONS}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - SERVER_COUNTRIES=${SERVER_COUNTRIES}
     networks:
       - media
     volumes:
       - ${CONFIG_BASE_DIR}/gluetun:/gluetun
     ports:
-      - 9000:9000/tcp
+      - 6000:9000/tcp
+      - 6881:6881 # qbittorrent
+      - 6881:6881/udp # qbittorrent
       - 7000:8000/tcp
       - 8112:8112 # deluge
       - 8080:8080 # sabnzbd
+      - 8091:8091 # qbittorrent
+      - 9091:9091 # transmission/transmission-openvpn
+      - 51413:51413 # transmission/transmission-openvpn
+      - 51413:51413/udp # transmission/transmission-openvpn
     restart: unless-stopped
 
   deluge:
@@ -35,6 +43,8 @@ services:
       - DELUGE_LOGLEVEL=info
       - UMASK=${UMASK}
     network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
@@ -145,6 +155,25 @@ services:
   #     - 6789:6789
   #   restart: unless-stopped
 
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+      - WEBUI_PORT=8091
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    volumes:
+      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+      - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+      - ${CONFIG_BASE_DIR}/qbittorrent:/config
+    restart: unless-stopped
+
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
@@ -154,6 +183,8 @@ services:
       - TZ=${TZ}
       - UMASK=${UMASK}
     network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
     volumes:
       - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
       - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
@@ -215,45 +246,47 @@ services:
   #     - ${CONFIG_BASE_DIR}/sabnzbdvpn:/config
   #   restart: unless-stopped
 
-  # transmission:
-  #   image: lscr.io/linuxserver/transmission:latest
-  #   container_name: transmission
-  #   hostname: transmission
-  #   environment:
-  #     - DEBUG=true
-  #     - ENABLE_UFW=true
-  #     - GLOBAL_APPLY_PERMISSIONS=false
-  #     - HEALTH_CHECK_HOST=${HEALTH_CHECK_HOST}
-  #     - LOCAL_NETWORK=
-  #     - OPENVPN_CONFIG=${OPENVPN_CONFIG}
-  #     - OPENVPN_OPTS=${OPENVPN_OPTS}
-  #     - PASS=${VPN_PASS}
-  #     - OPENVPN_PROVIDER=${OPENVPN_PROVIDER}
-  #     - USER=${VPN_USER}
-  #     - PEER_DNS=false
-  #     - PEER_DNS_PIN_ROUTES=false
-  #     - PGID=${PGID}
-  #     - PUID=${PUID}
-  #     - TRANSMISSION_DOWNLOAD_DIR=${DATA_DIR_COMPLETE_RELATIVE}
-  #     - TRANSMISSION_INCOMPLETE_DIR=${DATA_DIR_INCOMPLETE_RELATIVE}
-  #     - TRANSMISSION_WEB_UI=flood-for-transmission
-  #     - TZ=${TZ}
-  #     - UFW_ALLOW_GW_NET=true
-  #     - UFW_DISABLE_IPTABLES_REJECT=true
-  #     - UFW_EXTRA_PORTS=6789,6881,8080,8112,9091,9910
-  #     - UMASK=${UMASK}
-  #   network_mode: "service:sabnzbdvpn"
-  #   volumes:
-  #     # - /path/to/data:/config
-  #     # - /path/to/downloads:/downloads
-  #     # - /path/to/watch/folder:/watch
-  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
-  #     - ${CONFIG_BASE_DIR}/transmission-openvpn:/config
-  #     # - ${CONFIG_BASE_DIR}/transmission-openvpn/entrypoint.sh:/entrypoint.sh
-  #     # - ${CONFIG_BASE_DIR}/transmission-openvpn/openvpn:/etc/openvpn/custom
-  #   restart: unless-stopped
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - DEBUG=${DEBUG}
+      - ENABLE_UFW=true
+      - GLOBAL_APPLY_PERMISSIONS=false
+      - HOST_WHITELIST=
+      - LOCAL_NETWORK=
+      - PASS=${TRANSMISSION_PASS}
+      - PEER_DNS_PIN_ROUTES=false
+      - PEER_DNS=false
+      - PEERPORT=
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TRANSMISSION_DOWNLOAD_DIR=${DATA_DIR_COMPLETE_RELATIVE}
+      - TRANSMISSION_INCOMPLETE_DIR=${DATA_DIR_INCOMPLETE_RELATIVE}
+      
+      # (optional) Download the ZIP file below and extract the contents to
+      # "flood-for-transmission" in the "[CONFIG_BASE_DIR]/transmission" location: 
+      #     https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.zip    
+      - TRANSMISSION_WEB_HOME=/config/flood-for-transmission
+      - TRANSMISSION_WEB_UI=flood-for-transmission
+      
+      - TZ=${TZ}
+      - UFW_ALLOW_GW_NET=true
+      - UFW_DISABLE_IPTABLES_REJECT=true
+      - UFW_EXTRA_PORTS=6789,6881,8080,8112,9091,9910
+      - UMASK=${UMASK}
+      - USER=${TRANSMISSION_USER}
+      - WHITELIST=
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+      - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+      - ${CONFIG_BASE_DIR}/transmission:/config
+    restart: unless-stopped
 
   # transmission-openvpn:
   #   image: haugene/transmission-openvpn
@@ -266,7 +299,7 @@ services:
   #     - 8.8.8.8
   #     - 8.8.4.4
   #   environment:
-  #     - DEBUG=true
+  #     - DEBUG=${DEBUG}
   #     - ENABLE_UFW=true
   #     - GLOBAL_APPLY_PERMISSIONS=false
   #     - HEALTH_CHECK_HOST=${HEALTH_CHECK_HOST}

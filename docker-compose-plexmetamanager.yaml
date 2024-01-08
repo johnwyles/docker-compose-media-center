@@ -1,13 +1,13 @@
 # ||--------------------------------------------------------------------------------||
 # ||                                Plex Meta Manager                               ||
 # ||--------------------------------------------------------------------------------||
-version: "3.6"
+version: "3.7"
 
 services:
   plexmetamanager:
-    #image: meisnate12/plex-meta-manager:latest
     image: lscr.io/linuxserver/plex-meta-manager:latest
     container_name: plexmetamanager
+    hostname: plexametamanager
     environment:
       - PGID=${PGID}
       - PMM_PLEX_TOKEN=${PMM_PLEX_TOKEN}
@@ -20,7 +20,7 @@ services:
       - media
     volumes:
       - ${CONFIG_BASE_DIR}/plexmetamanager:/config
-    restart: "no"
+    restart: no
 
 networks:
   media:

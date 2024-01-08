@@ -2,9 +2,9 @@
 # ||                               Other Applications                               ||
 # ||--------------------------------------------------------------------------------||
 
-# TODO: ALL files should have "depends_on"
+# TODO: Should ALL services have "depends_on" gluetun?
 
-version: "3.6"
+version: "3.7"
 
 services:
   searxng:
@@ -47,16 +47,16 @@ services:
       - ${CONFIG_BASE_DIR}/syncthing:/config
       - /volume1/Documents/sync:/sync
     ports:
-      - 21027:21027/udp
-      - 22000:22000/tcp
-      - 22000:22000/udp
       - 8384:8384
+      - 22000:22000/udp
+      - 22000:22000/tcp
+      - 21027:21027/udp
     restart: unless-stopped
 
   tailscale:
     image: tailscale/tailscale:latest
     container_name: tailscale
-    hostname: extropy-nas
+    hostname: ${TAILSCALE_HOSTNAME}
     cap_add:
       - NET_ADMIN
       - NET_RAW

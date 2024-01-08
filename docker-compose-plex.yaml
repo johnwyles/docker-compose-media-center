@@ -1,12 +1,13 @@
 # ||--------------------------------------------------------------------------------||
 # ||                                Plex Applications                               ||
 # ||--------------------------------------------------------------------------------||
-version: "3.6"
+version: "3.7"
 
 services:
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
+    hostname: jellyfin
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
@@ -21,15 +22,16 @@ services:
       - ${MUSIC_DIR_LOCAL}:${MUSIC_DIR_RELATIVE}
       - ${TV_DIR_LOCAL}:${TV_DIR_RELATIVE}
     ports:
+      # - 1900:1900/udp
+      - 7359:7359/udp
       - 8096:8096
       - 8920:8920
-      - 7359:7359/udp
-      # - 1900:1900/udp
     restart: unless-stopped
 
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
+    hostname: jellyseerr
     environment:
       - LOG_LEVEL=debug
       - PGID=${PGID}
@@ -42,24 +44,6 @@ services:
       - ${CONFIG_BASE_DIR}/jellyseerr:/app/config
     ports:
       - 5056:5055
-    restart: unless-stopped
-
-  notifiarr:
-    image: golift/notifiarr
-    container_name: notifiarr
-    hostname: notifiarr
-    environment:
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    networks:
-      - media
-    volumes:
-      - /var/run/utmp:/var/run/utmp
-      - ${CONFIG_BASE_DIR}/notifiarr/notifiarr.conf:/config/notifiarr.conf
-    ports:
-      - 5454:5454
     restart: unless-stopped
 
   overseerr:
@@ -101,18 +85,19 @@ services:
       - ${TV_DIR_LOCAL}:${TV_DIR_RELATIVE}
     ports:
       - 3005:3005
+      - 8324:8324
       - 32400:32400
       - 32410:32410
       - 32412:32412
       - 32413:32413
       - 32414:32414
       - 32469:32469
-      - 8324:8324
     restart: unless-stopped
 
   tautulli:
     image: lscr.io/linuxserver/tautulli:latest
     container_name: tautulli
+    hostname: tautulli
     environment:
       - PGID=${PGID}
       - PUID=${PUID}

@@ -43,6 +43,24 @@ services:
       - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
     restart: unless-stopped
 
+  notifiarr:
+    image: golift/notifiarr
+    container_name: notifiarr
+    hostname: notifiarr
+    environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    volumes:
+      - /var/run/utmp:/var/run/utmp
+      - ${CONFIG_BASE_DIR}/notifiarr:/config
+    ports:
+      - 5454:5454
+    restart: unless-stopped
+
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
