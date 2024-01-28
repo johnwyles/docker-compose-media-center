@@ -6,23 +6,45 @@ at-home NAS.
 
 ## Docker Compose Files and the Applications and Services within
 
-### `docker-compose-portainer.yml`
+### `docker-compose-portainer.yaml`
 
 - [Portainer](https://hub.docker.com/r/portainer/portainer) Portainer for
   managing the remaining "Stacks" (docker-compose files).
 
-### `docker-compose-base.yml`
+### `docker-compose-base.yaml`
 
 - [Gluetun](https://github.com/qdm12/gluetun): Utility for a base VPN killswitch
   container that the downloading containers filter through when downloading.
+- [SearXNG](https://github.com/searxng/searxng-docker): Utility for an internet
+  metasearch engine that aggregates search results.
 - [Syncthing](https://github.com/linuxserver/docker-syncthing): Utility for
   syncing files across machines.
-- [Tailscale](https://hub.docker.com/r/tailscale/tailscale): Tailscale for VPN to
-  home network and for sharing services and files.
+- [Tailscale](https://hub.docker.com/r/tailscale/tailscale): Private VPN to
+  chain together your home network and other networks and machines for sharing
+  services and files.
 - [Watchtower](https://github.com/containrrr/watchtower): Watchtower for watching
   updates to docker images and pulling them down.
 
-### `docker-compose-downloaders.yml`
+### `docker-compose-crypto.yaml`
+
+**NOTE:** I do not set this up in later steps below as I highly doubut you will want
+to peg your CPU and run this utility alongside what this guide was meant to assit
+in setting up. You will likely find it completely unnessesary but feel free to
+contact me if you would like more information.
+
+- [rana](https://github.com/grunch/rana): A tool for finding _vanity_ public
+  keys used with `nostr`.
+- [vanity-age](https://github.com/johnwyles/vanity-age): A rewrite in a fork I
+  did of [vanity-age](https://github.com/sobaq/vanity-age) for finding _vanity_
+  public `age` keys.
+
+### `docker-compose-downloaders.yaml`
+
+**NOTE:**: For posterity's sake I left in SABnzbdVPN and Transmission-OpenVPN
+but they are commented out in the `docker-compose-downloaders.yaml` file. I
+found using [glueun](`docker-compose-base.yaml`) mentioned above in the
+`docker-compose-base.yaml` to be a better utility to operate as a
+VPN killswitch universally I could plug any container I wanted to up to it.
 
 - [Deluge](https://github.com/linuxserver/docker-deluge): Deluge for torrent
   downloads.
@@ -30,16 +52,22 @@ at-home NAS.
   downloads.
 - [SABnzbd](https://github.com/linuxserver/docker-sabnzbd) SABnzbd for Usenet
   downloads.
-- [Transmission-OpenVPN](https://github.com/haugene/docker-transmission-openvpn):
+- ~~[SABnnzdVPN](https://github.com/binhex/arch-sabnzbdvpn) SABnzbd with OpenVPN
+  for torrent downloads which includes a VPN killswitch to stop downloading on
+  loss of a VPN connection.~~
+- [Tranismission](https://docs.linuxserver.io/images/docker-transmission/)
+  Transmission for torrent downloads.
+- ~~[Transmission-OpenVPN](https://github.com/haugene/docker-transmission-openvpn):
   Transmission with OpenVPN for torrent downloads which includes a VPN killswitch
-  to stop downloading on loss of a VPN connection.
+  to stop downloading on loss of a VPN connection.~~
 - [Unpackerr](https://hub.docker.com/r/golift/unpackerr): Unpackerr for any
   unpacking in post-processing after download.
 
-### `docker-compose-stararr.yml`
+### `docker-compose-stararr.yaml`
 
 - [Bazarr](https://github.com/linuxserver/docker-bazarr): Bazarr for adding
   Subtitles to media found in Radarr and Sonarr.
+- [Mylar3](https://github.com/mylar3/mylar3): Mylar3 for Comic Books.
 - [Lidarr](https://github.com/linuxserver/docker-lidarr): Lidarr for Music.
 - [Prowlarr](https://github.com/linuxserver/docker-prowlarr): Prowlarr for
   adding Indexers to Stararr services.
@@ -49,7 +77,7 @@ at-home NAS.
 - [Sonarr](https://github.com/linuxserver/docker-sonarr): Sonarr for TV series
   and shows.
 
-### `docker-compose-plex.yml`
+### `docker-compose-plex.yaml`
 
 - [Jellyfin](https://github.com/linuxserver/docker-jellyfin): Jellyfin media
   center for viewing and playing all of your media.
@@ -63,6 +91,14 @@ at-home NAS.
   statistics and monitoring.
 - [Overseerr](https://github.com/linuxserver/docker-overseerr): Overseer for
   browsing and discovering of new media.
+
+### `docker-compose-plexmetamanager`
+
+- [PlexMetaManager](https://docs.linuxserver.io/images/docker-plex-meta-manager/):
+A fairly complex piece of software to render badges, evaluate audience/user/critic
+ratings, creat/manage collections, and a whole host of many other things. The best
+way to get started is probably seeing some explanations and visuals on the
+[PlexMetaManager main GitHub page](https://github.com/meisnate12/Plex-Meta-Manager).
 
 ## Installation and Setup
 
@@ -92,25 +128,25 @@ sections:
 - [Directory Structure](#directory-structure),
 - [Environment Variables](#environment-variables)
 
-  You **must** complete these steps in this README *before* moving on to the next.
+  You **must** complete these steps in this README _before_ moving on to the next.
 
-4. Run these `docker compose` commands in order (**Note:** there are no
-  `depends_on` although internally the `docker-compose-downloaders.yml` file
-  has containers which are interdependent (i.e. `sabnzbd` and `deluge` use
-  the `gluetun` network service to enable the VPN killswitch) ):
+4. Run these `docker compose` commands in order (**Note:** there are few
+  `depends_on` throughout though internally the `docker-compose-downloaders.yaml`
+  file has containers which are dependent on another - i.e. `sabnzbd` and `deluge`
+  use the `gluetun` network service to utilize it's utility as a VPN killswitch):
 
 - First things first so we get the Portainer instance going:
   - `docker compose --file docker-compose-portainer.yaml --env-file .env up --detach`
 
 - And now for the rest:
   - `docker compose --file docker-compose-base.yaml --env-file .env up --detach`
-  - `docker compose --file docker-compose-downloaders.yml --env-file .env up --detach`
-  - `docker compose --file docker-compose-stararr.yml --env-file .env up --detach`
-  - `docker compose --file docker-compose-plex.yml --env-file .env up --detach`
+  - `docker compose --file docker-compose-downloaders.yaml --env-file .env up --detach`
+  - `docker compose --file docker-compose-stararr.yaml --env-file .env up --detach`
+  - `docker compose --file docker-compose-plex.yaml --env-file .env up --detach`
 
-- Lastly to setup PlexMetaManager you'll want to add a cron entry you run
-periodically with:
-  - `docker-compose --file docker-compose-plexmetamanager.yaml --env-file variables.env up plexmetamanager`
+- Lastly if you'd like to setup PlexMetaManager you'll want to add a cron entry
+you run periodically (around every 24-96 hours) with the following command:
+  - `docker-compose --file docker-compose-plexmetamanager.yaml --env-file .env up plexmetamanager --detach`
 
 ## Directory Structure
 
@@ -130,13 +166,14 @@ run the following:
 
 ```shell
 mkdir -p ${CONFIG_BASE_DIR}/bazarr
-mkdir -p ${CONFIG_BASE_DIR}/caddy
+# mkdir -p ${CONFIG_BASE_DIR}/caddy
 mkdir -p ${CONFIG_BASE_DIR}/deluge
 # mkdir -p ${CONFIG_BASE_DIR}/delugevpn
 mkdir -p ${CONFIG_BASE_DIR}/gluetun
 mkdir -p ${CONFIG_BASE_DIR}/jellyfin
 mkdir -p ${CONFIG_BASE_DIR}/jellyseerr
 mkdir -p ${CONFIG_BASE_DIR}/lidarr
+mkdir -p ${CONFIG_BASE_DIR}/mylar3
 mkdir -p ${CONFIG_BASE_DIR}/notifiarr
 # mkdir -p ${CONFIG_BASE_DIR}/nzbget
 mkdir -p ${CONFIG_BASE_DIR}/overseerr
@@ -144,16 +181,17 @@ mkdir -p ${CONFIG_BASE_DIR}/plex
 mkdir -p ${CONFIG_BASE_DIR}/plexmetamanager
 mkdir -p ${CONFIG_BASE_DIR}/portainer
 mkdir -p ${CONFIG_BASE_DIR}/prowlarr
+mkdir -p ${CONFIG_BASE_DIR}/qbittorrent
 mkdir -p ${CONFIG_BASE_DIR}/radarr
 # mkdir -p ${CONFIG_BASE_DIR}/rana
 mkdir -p ${CONFIG_BASE_DIR}/readarr
 mkdir -p ${CONFIG_BASE_DIR}/sabnzbd
-mkdir -p ${CONFIG_BASE_DIR}/sabnzbdvpn
+# mkdir -p ${CONFIG_BASE_DIR}/sabnzbdvpn
 mkdir -p ${CONFIG_BASE_DIR}/sonarr
 mkdir -p ${CONFIG_BASE_DIR}/syncthing
 mkdir -p ${CONFIG_BASE_DIR}/tailscale
 mkdir -p ${CONFIG_BASE_DIR}/tautulli
-# mkdir -p ${CONFIG_BASE_DIR}/transmission
+mkdir -p ${CONFIG_BASE_DIR}/transmission
 # mkdir -p ${CONFIG_BASE_DIR}/transmission-openvpn
 mkdir -p ${CONFIG_BASE_DIR}/unpackerr
 mkdir -p ${CONFIG_BASE_DIR}/watchtower
@@ -170,13 +208,18 @@ variables and their purpose:
 - `BOOKS_DIR_LOCAL`: The directory to keep Book files that are organized
   locally on disk (i.e. `/volume1/books`)
 - `BOOKS_DIR_RELATIVE`: The directory to keep Book files that are organized
-  *relative* to the container (i.e. **not** the actual location of the files on
+  _relative_ to the container (i.e. **not** the actual location of the files on
   disk e.g. `/books` => `${BOOKS_DIR_LOCAL}` e.g. `/books` => `/volume1/books`)
+- `COMICS_DIR_LOCAL`: The directory to keep Comic Book files that are organized
+  locally on disk (i.e. `/volume1/books`)
+- `COMICS_DIR_RELATIVE`: The directory to keep Comic Book files that are organized
+  _relative_ to the container (i.e. **not** the actual location of the files on
+  disk e.g. `/books` => `${BOOKS_DIR_LOCAL}` e.g. `/comics` => `/volume1/comics`)
 - `CONFIG_BASE_DIR`: The base directory where each of the containers will have
   their configurations persistently stored between reboots, restarts, etc. (e.g.
   `/volume1/docker`... and will serve the container the directory (e.g.
-  *Deluge* => `/volume1/docker`/deluge, *Plex* =>
-  `/volume1/docker`/plex, *Tailscale* => `/volume1/docker`/tailscale, etc.) =>
+  _Deluge_ => `/volume1/docker`/deluge, _Plex_ =>
+  `/volume1/docker`/plex, _Tailscale_ => `/volume1/docker`/tailscale, etc.) =>
   (e.g. Deluge => `deluge`, Plex => `plex`,
   Tailscale => `tailscale`, etc.)
 - `CONFIG_DATA_DIR`: The directory for each of the containers to store their
@@ -186,19 +229,19 @@ variables and their purpose:
 - `DATA_DIR_COMPLETE_LOCAL`: The directory to keep completely downloaded
   files locally on disk (i.e. `/volume1/data/complete`)
 - `DATA_DIR_COMPLETE_RELATIVE`: The directory to keep completely downloaded
-  files *relative* to the container (i.e. **not** the actual location of the
+  files _relative_ to the container (i.e. **not** the actual location of the
   files on disk e.g. `/complete` => `${DATA_DIR_COMPLETE_LOCAL}` e.g.
   `/complete` => `/volume1/data/complete`)
 - `DATA_DIR_INCOMPLETE_LOCAL`: The directory to keep incompletely downloaded
   files locally on disk (i.e. `/volume1/data/incomplete`)
 - `DATA_DIR_INCOMPLETE_RELATIVE`: The directory to keep incompletely downloaded
-  files *relative* to the container (i.e. **not** the actual location of the
+  files _relative_ to the container (i.e. **not** the actual location of the
   files on disk e.g. `/incomplete` => `${DATA_DIR_INCOMPLETE_LOCAL}` e.g.
   `/incomplete` => `/volume1/data/watch`)
 - `DATA_DIR_WATCH_LOCAL`: The directory to keep files to be watched
   locally on disk (i.e. `/volume1/data/watch`)
 - `DATA_DIR_WATCH_RELATIVE`: The directory to keep files to be watched
-  *relative* to the container (i.e. **not** the actual location of the files on
+  _relative_ to the container (i.e. **not** the actual location of the files on
   disk e.g. `/watch` => `${DATA_DIR_WATCH_LOCAL}` e.g. `/watch` =>
   `/volume1/data/watch`)
 - `GATEWAY_IP`: Gateway IP for the Docker Compose subnet (e.g. `172.16.0.1`)
@@ -211,13 +254,13 @@ variables and their purpose:
 - `MOVIES_DIR_LOCAL`: The directory to keep Movie files that are organized
   locally on disk (i.e. `/volume1/movies`)
 - `MOVIES_DIR_RELATIVE`: The directory to keep Movie files that are organized
-  *relative* to the container (i.e. **not** the actual location of the files on
+  _relative_ to the container (i.e. **not** the actual location of the files on
   disk e.g. `/movies` => `${MOVIES_DIR_LOCAL}` e.g. `/movies` =>
   `/volume1/movies`)
 - `MUSIC_DIR_LOCAL`: The directory to keep Music files that are organized
   locally on disk (i.e. `/volume1/music`)
 - `MUSIC_DIR_RELATIVE`: The directory to keep Music files that are organized
-  *relative* to the container (i.e. **not** the actual location of the files on
+  _relative_ to the container (i.e. **not** the actual location of the files on
   disk e.g. `/music` => `${MUSIC_DIR_LOCAL}` e.g. `/music` => `/volume1/music`)
 - `NAME_SERVERS`: The DNS servers to use when the VPN is connected
 - ~~`NZBGET_WEBUI_PASSWORD`: NZBGet Password for the Web UI~~
@@ -230,7 +273,7 @@ variables and their purpose:
 - `PERSONAL_DIR_LOCAL`: The directory where Personal videos files that are organized
   locally on disk (i.e. `/volume1/personal/videos`)
 - `PERSONAL_DIR_RELATIVE`: The directory where Personal videos files that are organized
-  *relative* to the container (i.e. **not** the actual location of the files on
+  _relative_ to the container (i.e. **not** the actual location of the files on
   disk e.g. `/personal` => `${PERSONAL_DIR_LOCAL}` e.g. `/personal` => `/volume1/personal/videos`)
 - `PLEX_CLAIM`: The Plex claim ID received from <https://plex.tv/claim> when
   first starting the Plex service
@@ -262,7 +305,7 @@ variables and their purpose:
 - `TV_DIR_LOCAL`: The directory to keep TV show files that are organized
   locally on disk (i.e. `/volume1/tv`)
 - `TV_DIR_RELATIVE`: The directory to keep TV show files that are organized
-  *relative* to the container (i.e. **not** the actual location of the files on
+  _relative_ to the container (i.e. **not** the actual location of the files on
   disk e.g. `/tv` => `${TV_DIR_LOCAL}` e.g. `/tv` => `/volume1/tv`)
   `/volume1/movies`)
 - `UN_LIDARR_0_API_KEY`: Lidarr API key
@@ -276,6 +319,15 @@ variables and their purpose:
 - `WATCHTOWER_POLL_INTERVAL`: Interval for Watchtower to check for new container images (e.g. 21600 ("6 hours"))
 - `WIREGUARD_PRIVATE_KEY`: Gluetun wireguard private key setting (Author note: I do regret if you have to go through setting this arduous process... Details here (for NordVPN at least): [Getting NordVPN WireGuard details](https://gist.github.com/bluewalk/7b3db071c488c82c604baf76a42eaad3)
 
+## TODO
+
+  Now personal notes to myself on some of that which remains:
+
+- HUGE: Add instructions for wiring everything together (with pictures?).
+- Add `ports` and whatever else from `docker-compose-*.yaml` files to be passed
+  as ENV variables.
+- Add instructions for Gluetun containers to replace those found below.
+
 ## TODO: CHANGE THIS TO GLUETUN INSTUCTIONS - Transmission OpenVPN Setup
 
 Even if you are not using Transmission for your torrent download client (I
@@ -284,7 +336,7 @@ DelugeVPN project and it also is more stable of a connection between both the
 containers using it as well as with the VPN provider. Additionally the
 Transmission OpenVPN project is more friendly for selecting multipule VPN
 servers as well as configuration. Below is an example with Private Internet
-Access but the project supports *many* other services (which again is also why
+Access but the project supports _many_ other services (which again is also why
 I did not like the DelugeVPN project). You'll want to follow similar steps for
 whichever provider you have chosen. However, the end goal is to get all of your
 OpenVPN `.ovpn` files downloaded in the Transmission OpenvVPN containers

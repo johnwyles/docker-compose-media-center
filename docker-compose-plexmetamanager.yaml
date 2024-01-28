@@ -20,7 +20,7 @@ services:
       - media
     volumes:
       - ${CONFIG_BASE_DIR}/plexmetamanager:/config
-    restart: no
+    restart: "no"
 
 networks:
   media:

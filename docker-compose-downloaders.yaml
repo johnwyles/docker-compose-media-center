@@ -168,10 +168,10 @@ services:
     depends_on:
       - gluetun
     volumes:
+      - ${CONFIG_BASE_DIR}/qbittorrent:/config
       - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
       - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
       - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
-      - ${CONFIG_BASE_DIR}/qbittorrent:/config
     restart: unless-stopped
 
   sabnzbd:

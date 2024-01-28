@@ -38,9 +38,29 @@ services:
       - 8686:8686
     volumes:
       - ${CONFIG_BASE_DIR}/lidarr:/config
-      - /volume1/Music:/music
+      - ${MUSIC_DIR_LOCAL}:${MUSIC_DIR_RELATIVE}
       - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
       - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+    restart: unless-stopped
+
+  mylar3:
+    image: lscr.io/linuxserver/mylar3:latest
+    container_name: mylar3
+    hostname: mylar3
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/mylar3:/config
+      - ${COMICS_DIR_LOCAL}:${COMICS_DIR_RELATIVE}
+      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+    ports:
+      - 8090:8090
     restart: unless-stopped
 
   notifiarr:
