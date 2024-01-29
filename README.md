@@ -11,10 +11,8 @@ at-home NAS.
 - [Portainer](https://hub.docker.com/r/portainer/portainer) Portainer for
   managing the remaining "Stacks" (docker-compose files).
 
-### `docker-compose-base.yaml`
+### `docker-compose-tools.yaml`
 
-- [Gluetun](https://github.com/qdm12/gluetun): Utility for a base VPN killswitch
-  container that the downloading containers filter through when downloading.
 - [SearXNG](https://github.com/searxng/searxng-docker): Utility for an internet
   metasearch engine that aggregates search results.
 - [Syncthing](https://github.com/linuxserver/docker-syncthing): Utility for
@@ -42,12 +40,14 @@ contact me if you would like more information.
 
 **NOTE:**: For posterity's sake I left in SABnzbdVPN and Transmission-OpenVPN
 but they are commented out in the `docker-compose-downloaders.yaml` file. I
-found using [glueun](`docker-compose-base.yaml`) mentioned above in the
-`docker-compose-base.yaml` to be a better utility to operate as a
-VPN killswitch universally I could plug any container I wanted to up to it.
+found using [glueun](`https://github.com/qdm12/gluetun`) mentioned above to be a
+better utility to operate as a VPN killswitch universally I could plug any
+container I wanted to up to it.
 
 - [Deluge](https://github.com/linuxserver/docker-deluge): Deluge for torrent
   downloads.
+- [Gluetun](https://github.com/qdm12/gluetun): Utility for a base VPN killswitch
+  container that the downloading containers filter through when downloading.
 - [NZBGet](https://github.com/linuxserver/docker-nzbget): NZBGet for Usenet
   downloads.
 - [SABnzbd](https://github.com/linuxserver/docker-sabnzbd) SABnzbd for Usenet
@@ -139,7 +139,7 @@ sections:
   - `docker compose --file docker-compose-portainer.yaml --env-file .env up --detach`
 
 - And now for the rest:
-  - `docker compose --file docker-compose-base.yaml --env-file .env up --detach`
+  - `docker compose --file docker-compose-tools.yaml --env-file .env up --detach`
   - `docker compose --file docker-compose-downloaders.yaml --env-file .env up --detach`
   - `docker compose --file docker-compose-stararr.yaml --env-file .env up --detach`
   - `docker compose --file docker-compose-plex.yaml --env-file .env up --detach`
