@@ -263,13 +263,13 @@ services:
       - PUID=${PUID}
       - TRANSMISSION_DOWNLOAD_DIR=${DATA_DIR_COMPLETE_RELATIVE}
       - TRANSMISSION_INCOMPLETE_DIR=${DATA_DIR_INCOMPLETE_RELATIVE}
-      
+
       # (optional) Download the ZIP file below and extract the contents to
       # "flood-for-transmission" in the "[CONFIG_BASE_DIR]/transmission" location: 
       #     https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.zip    
       - TRANSMISSION_WEB_HOME=/config/flood-for-transmission
       - TRANSMISSION_WEB_UI=flood-for-transmission
-      
+
       - TZ=${TZ}
       - UFW_ALLOW_GW_NET=true
       - UFW_DISABLE_IPTABLES_REJECT=true
