@@ -1,10 +1,38 @@
 # docker-compose-media-center
 
 This respository contains the Docker compose files for standing up an entire
-Stararr stack along with a few other tools and services best suited for an
-at-home NAS.
+Servarr stack along with a few other supporting tools and services best suited
+for an at-home NAS or media center machine.
 
-## Docker Compose Files and the Applications and Services within
+## Useful Resources To Have On-hand
+
+Here are some useful resources to keep on hand as you go through the instuctions
+below for setting up the services contained in the Docker compose files in this
+repository:
+
+- [Servarr Wiki](https://wiki.servarr.com/): Best place to start to get to
+understand some of the services that are setup in the set of Docker compose
+files in this repository, what they are, and how to set them up and troubleshoot
+them.
+- [LinuxServer.io](https://docs.linuxserver.io/general/container-execution/):
+The How To section here is full of a lot of quick introductory material for not
+only Docker, Docker Compose, and other good material on what forms the foundation
+of many of the concepts you will need to understand utilizing the Docker compose
+files in this repository as well as following along with the instuctions below.
+Not only that but [LinuxServer.io](https://www.linuxserver.io/) has built and
+maintains many of the Docker images and formed, to a large extent, the formatting
+and structure of the Docker compose files in this repository.
+- [TRaSH Guides](https://trash-guides.info/): Collected here are a great set of
+documents that somewhat explain the services but is more of an excellent source
+for general best practices as well as offering tips and providing help for some
+edge cases you may encounter.
+
+## Docker Compose Files and the Applications and Services Within
+
+Below are a list of all of the Docker compose files that setup a Servarr stack,
+some associated assisting tools, media players, and also miscellaneous self-hosted
+tools you can skip and and/or remove from as well as mostly links to their
+associated Docker image sources, GitHub repositories, or
 
 ### `docker-compose-portainer.yaml`
 
@@ -55,7 +83,7 @@ container I wanted to up to it.
 - ~~[SABnnzdVPN](https://github.com/binhex/arch-sabnzbdvpn) SABnzbd with OpenVPN
   for torrent downloads which includes a VPN killswitch to stop downloading on
   loss of a VPN connection.~~
-- [Tranismission](https://docs.linuxserver.io/images/docker-transmission/)
+- [Tranismission](https://github.com/linuxserver/docker-transmission)
   Transmission for torrent downloads.
 - ~~[Transmission-OpenVPN](https://github.com/haugene/docker-transmission-openvpn):
   Transmission with OpenVPN for torrent downloads which includes a VPN killswitch
@@ -92,21 +120,21 @@ container I wanted to up to it.
 - [Overseerr](https://github.com/linuxserver/docker-overseerr): Overseer for
   browsing and discovering of new media.
 
-### `docker-compose-plexmetamanager`
+### `docker-compose-plexmetamanager.yaml`
 
-- [PlexMetaManager](https://docs.linuxserver.io/images/docker-plex-meta-manager/):
+- [Plex Meta Manager](https://github.com/linuxserver/docker-plex-meta-manager):
 A fairly complex piece of software to render badges, evaluate audience/user/critic
 ratings, creat/manage collections, and a whole host of many other things. The best
 way to get started is probably seeing some explanations and visuals on the
-[PlexMetaManager main GitHub page](https://github.com/meisnate12/Plex-Meta-Manager).
+[Plex Meta Manager main GitHub page](https://github.com/meisnate12/Plex-Meta-Manager)
+as well as on the [Plex Meta Manager wiki page](https://metamanager.wiki/en/latest/home/).
 
 ## Installation and Setup
 
 1. Install Docker
-
 2. Create a `media` network with:
 
-  ```shell
+    ```shell
     docker network create \
       --driver=bridge \
       --gateway=172.16.0.1 \
@@ -118,80 +146,83 @@ way to get started is probably seeing some explanations and visuals on the
       -o "com.docker.network.bridge.name"="media" \
       -o "com.docker.network.driver.mtu"="1500" \
       media
-  ```
+    ```
 
 3. Edit and move the file `environment_variables.env.example` saving it to the
 file to `.env` substituting with values you have after starting and setting up
 many of the services and applications. **IMPORTANT NOTE:** Complete these
-sections:
-
-- [Directory Structure](#directory-structure),
-- [Environment Variables](#environment-variables)
-
-  You **must** complete these steps in this README _before_ moving on to the next.
-
+sections as each **must** be completed as outlined _before_ moving to
+the next step:
+    - [Directory Structure](#directory-structure)
+    - [Environment Variables](#environment-variables)
 4. Run these `docker compose` commands in order (**Note:** there are few
   `depends_on` throughout though internally the `docker-compose-downloaders.yaml`
   file has containers which are dependent on another - i.e. `sabnzbd` and `deluge`
   use the `gluetun` network service to utilize it's utility as a VPN killswitch):
-
-- First things first so we get the Portainer instance going:
-  - `docker compose --file docker-compose-portainer.yaml --env-file .env up --detach`
-
-- And now for the rest:
-  - `docker compose --file docker-compose-tools.yaml --env-file .env up --detach`
-  - `docker compose --file docker-compose-downloaders.yaml --env-file .env up --detach`
-  - `docker compose --file docker-compose-stararr.yaml --env-file .env up --detach`
-  - `docker compose --file docker-compose-plex.yaml --env-file .env up --detach`
-
-- Lastly if you'd like to setup PlexMetaManager you'll want to add a cron entry
+    - First things first so we get the Portainer instance going:
+      - `docker compose --file docker-compose-portainer.yaml --env-file .env up --detach`
+    - And now for the rest:
+      - `docker compose --file docker-compose-tools.yaml --env-file .env up --detach`
+      - `docker compose --file docker-compose-downloaders.yaml --env-file .env up --detach`
+      - `docker compose --file docker-compose-stararr.yaml --env-file .env up --detach`
+      - `docker compose --file docker-compose-plex.yaml --env-file .env up --detach`
+    - Lastly if you'd like to setup PlexMetaManager you'll want to add a cron entry
 you run periodically (around every 24-96 hours) with the following command:
-  - `docker-compose --file docker-compose-plexmetamanager.yaml --env-file .env up plexmetamanager --detach`
+      - `docker-compose --file docker-compose-plexmetamanager.yaml --env-file .env up plexmetamanager --detach`
 
 ## Directory Structure
 
 In order to start you need to create several directories to house the
-configurations for each service and where the Docker container will persist that
-configuration locally between reboots, restarts, etc. This maps directly to the
-`CONFIG_BASE_DIR` directory in the `.env` file we will get to later.
+configurations for each service and where the Docker container will persist
+configurations locally between reboots, restarts, etc. This maps directly to the
+`CONFIG_BASE_DIR` directory in the `.env` file that we will get to later.
 
 ```shell
-export CONFIG_BASE_DIR=/volume1/data
+export CONFIG_BASE_DIR=/volume1/services # substitute for your path/preferences
 mkdir -p ${CONFIG_BASE_DIR}
 ```
 
 This sets the `CONFIG_BASE_DIR` directory that will store all of the subsequent
-directories for their Docker configurations. To create each of those directories
-run the following:
+directories for their Docker configurations. **NOTE:** I have marked items below
+I consider _optional_ but note that the files included here _will_ install them
+all unless you have commented them out as well. If you do not every directory below
+and it's subsequent service are later set up to be running and available to use.
+Whether you use them or not you may find you would like to try them later so my
+recommendation is to leave them as is and you can return later to remove them as
+you require. If you do skip some of the services marked `optional` in creating
+the directories below (highlighed by the `# optional ...` comments below then do
+your best to find the [environment variables](#environment-variables)) and comment
+those out as well (to keep down the noise in your `.env` file. To create each of
+the directories run the following after the command above:
 
 ```shell
 mkdir -p ${CONFIG_BASE_DIR}/bazarr
 # mkdir -p ${CONFIG_BASE_DIR}/caddy
-mkdir -p ${CONFIG_BASE_DIR}/deluge
+mkdir -p ${CONFIG_BASE_DIR}/deluge # optional Bittorrent client
 # mkdir -p ${CONFIG_BASE_DIR}/delugevpn
 mkdir -p ${CONFIG_BASE_DIR}/gluetun
-mkdir -p ${CONFIG_BASE_DIR}/jellyfin
-mkdir -p ${CONFIG_BASE_DIR}/jellyseerr
-mkdir -p ${CONFIG_BASE_DIR}/lidarr
-mkdir -p ${CONFIG_BASE_DIR}/mylar3
-mkdir -p ${CONFIG_BASE_DIR}/notifiarr
+mkdir -p ${CONFIG_BASE_DIR}/jellyfin # optional alternative to Plex
+mkdir -p ${CONFIG_BASE_DIR}/jellyseerr # optional alternative to Overseer for Plex
+mkdir -p ${CONFIG_BASE_DIR}/lidarr # optional if you are not interested in Music
+mkdir -p ${CONFIG_BASE_DIR}/mylar3 # optional if you are not interested in Comics
+mkdir -p ${CONFIG_BASE_DIR}/notifiarr # opptional tool to notify Discord various actions 
 # mkdir -p ${CONFIG_BASE_DIR}/nzbget
-mkdir -p ${CONFIG_BASE_DIR}/overseerr
+mkdir -p ${CONFIG_BASE_DIR}/overseerr # optional tool for requesting media content and discover of new content
 mkdir -p ${CONFIG_BASE_DIR}/plex
-mkdir -p ${CONFIG_BASE_DIR}/plexmetamanager
+mkdir -p ${CONFIG_BASE_DIR}/plexmetamanager # optional for many customizations (complex) for Plex
 mkdir -p ${CONFIG_BASE_DIR}/portainer
 mkdir -p ${CONFIG_BASE_DIR}/prowlarr
 mkdir -p ${CONFIG_BASE_DIR}/qbittorrent
 mkdir -p ${CONFIG_BASE_DIR}/radarr
 # mkdir -p ${CONFIG_BASE_DIR}/rana
-mkdir -p ${CONFIG_BASE_DIR}/readarr
+mkdir -p ${CONFIG_BASE_DIR}/readarr # optional if you are not interested in Books/AudioBooks
 mkdir -p ${CONFIG_BASE_DIR}/sabnzbd
 # mkdir -p ${CONFIG_BASE_DIR}/sabnzbdvpn
 mkdir -p ${CONFIG_BASE_DIR}/sonarr
-mkdir -p ${CONFIG_BASE_DIR}/syncthing
-mkdir -p ${CONFIG_BASE_DIR}/tailscale
-mkdir -p ${CONFIG_BASE_DIR}/tautulli
-mkdir -p ${CONFIG_BASE_DIR}/transmission
+mkdir -p ${CONFIG_BASE_DIR}/syncthing # optional file synchronization service
+mkdir -p ${CONFIG_BASE_DIR}/tailscale # optional home network "VPN" service
+mkdir -p ${CONFIG_BASE_DIR}/tautulli # optional analytics service for Plex
+mkdir -p ${CONFIG_BASE_DIR}/transmission # optional Bittorrent client
 # mkdir -p ${CONFIG_BASE_DIR}/transmission-openvpn
 mkdir -p ${CONFIG_BASE_DIR}/unpackerr
 mkdir -p ${CONFIG_BASE_DIR}/watchtower
@@ -283,6 +314,18 @@ variables and their purpose:
 - `PRIVATE_INTERNET_ACCESS_VPN_PORT_FORWARDING`: Gluetun VPN killswitch setting for port forward with Private Internet Access (i.e. `on` or `off`)
 - `SERVER_COUNTRIES`: Gluetun VPN killswitch setting for the regions to use (e.g. `Switzerland,Estonia,Iceland,Panama,Romania`)
 - `SUBNET`: The subnet for the Docker Compose environment (e.g. `172.16.0.0/16`)
+- `SYNCTHING_MOUNT_DIR_1_LOCAL`: The directory of a path locally that you would
+like to have Syncthing sync with other Syncthing instances (i.e. `/volume1/sync`)
+- `SYNCTHING_MOUNT_DIR_1_RELATIVE`: The directory Syncthing will refer to locally
+_relative_ to the container (i.e. **not** the actual location of the files on
+  disk e.g. `/sync` => `${SYNCTHING_MOUNT_DIR_1_LOCAL}` e.g. `/sync` =>
+  `/volume1/sync`)
+- `SYNCTHING_MOUNT_DIR_2_LOCAL`: The directory of a path locally that you would
+like to have Syncthing sync with other Syncthing instances (i.e. `/volume1/some_other_directory`)
+- `SYNCTHING_MOUNT_DIR_2_RELATIVE`: The directory Syncthing will refer to locally
+_relative_ to the container (i.e. **not** the actual location of the files on
+  disk e.g. `/some_other_directory` => `${SYNCTHING_MOUNT_DIR_1_LOCAL}` e.g. `/some_other_directory` =>
+  `/volume1/some_other_directory`)
 - `TAILSCALE_HOSTNAME`: The hostname of this tailscale instance (e.g.
   `my-nas-server`)
 - `TAILSCALE_STATE_ARG`: The Tailscale argument for the state argument variable
@@ -328,9 +371,11 @@ variables and their purpose:
   as ENV variables.
 - Add instructions for Gluetun containers to replace those found below.
 
-## TODO: CHANGE THIS TO GLUETUN INSTUCTIONS - Transmission OpenVPN Setup
+### TODO: Change This to Gluetun Instructions
 
-Even if you are not using Transmission for your torrent download client (I
+#### ~~Transmission OpenVPN Setup~~
+
+~~Even if you are not using Transmission for your torrent download client (I
 personally use Deluge) I found the container comes up much faster than the
 DelugeVPN project and it also is more stable of a connection between both the
 containers using it as well as with the VPN provider. Additionally the
@@ -340,7 +385,7 @@ Access but the project supports _many_ other services (which again is also why
 I did not like the DelugeVPN project). You'll want to follow similar steps for
 whichever provider you have chosen. However, the end goal is to get all of your
 OpenVPN `.ovpn` files downloaded in the Transmission OpenvVPN containers
-configuration directory under the directory `openvpn`:
+configuration directory under the directory `openvpn`:~~
 
 ```shell
 pushd ${CONFIG_BASE_DIR}/transmission-openvpn/
