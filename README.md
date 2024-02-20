@@ -366,10 +366,11 @@ _relative_ to the container (i.e. **not** the actual location of the files on
 
   Now personal notes to myself on some of that which remains:
 
-- HUGE: Add instructions for wiring everything together (with pictures?).
-- Add `ports` and whatever else from `docker-compose-*.yaml` files to be passed
-  as ENV variables.
-- Add instructions for Gluetun containers to replace those found below.
+- **P0:** Consider adding [photoprism](https://github.com/photoprism/photoprism)
+- **P1:** Add instructions for wiring everything together (with pictures?).
+- **P1:** Add instructions for Gluetun containers to replace those found below.
+- **P2:** Add `ports` and whatever else from `docker-compose-*.yaml` files to be
+  passed as ENV variables.
 
 ### TODO: Change This to Gluetun Instructions
 
