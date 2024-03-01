@@ -4,6 +4,25 @@ This respository contains the Docker compose files for standing up an entire
 Servarr stack along with a few other supporting tools and services best suited
 for an at-home NAS or media center machine.
 
+**Table of contents:**
+- [docker-compose-media-center](#docker-compose-media-center)
+  - [Useful Resources To Have On-hand](#useful-resources-to-have-on-hand)
+  - [Docker Compose Files and the Applications and Services Within](#docker-compose-files-and-the-applications-and-services-within)
+    - [`docker-compose-portainer.yaml`](#docker-compose-portaineryaml)
+    - [`docker-compose-tools.yaml`](#docker-compose-toolsyaml)
+    - [`docker-compose-crypto.yaml`](#docker-compose-cryptoyaml)
+    - [`docker-compose-downloaders.yaml`](#docker-compose-downloadersyaml)
+    - [`docker-compose-stararr.yaml`](#docker-compose-stararryaml)
+    - [`docker-compose-plex.yaml`](#docker-compose-plexyaml)
+    - [`docker-compose-plexmetamanager.yaml`](#docker-compose-plexmetamanageryaml)
+  - [Installation and Setup](#installation-and-setup)
+  - [Directory Structure](#directory-structure)
+  - [Environment Variables](#environment-variables)
+  - [TODO](#todo)
+    - [TODO: Change This to Gluetun Instructions](#todo-change-this-to-gluetun-instructions)
+      - [~~Transmission OpenVPN Setup~~](#transmission-openvpn-setup)
+
+
 ## Useful Resources To Have On-hand
 
 Here are some useful resources to keep on hand as you go through the instuctions
@@ -312,6 +331,7 @@ variables and their purpose:
 - `PMM_PLEX_URL`: The internal Docker URL for the plex container for use by Plex
   Meta Manager (e.g. (and probably should not change) `http://plex:32400`)
 - `PRIVATE_INTERNET_ACCESS_VPN_PORT_FORWARDING`: Gluetun VPN killswitch setting for port forward with Private Internet Access (i.e. `on` or `off`)
+- ~~`RANA_ARGUMENTS`: Arguments to pass in `rana` on execution to find a prefixed sub-string(s) (e.g. "-n=j0hnwyles,j0hnwyl3s -c 4")~~
 - `SERVER_COUNTRIES`: Gluetun VPN killswitch setting for the regions to use (e.g. `Switzerland,Estonia,Iceland,Panama,Romania`)
 - `SUBNET`: The subnet for the Docker Compose environment (e.g. `172.16.0.0/16`)
 - `SYNCTHING_MOUNT_DIR_1_LOCAL`: The directory of a path locally that you would
@@ -355,6 +375,7 @@ _relative_ to the container (i.e. **not** the actual location of the files on
 - `UN_RADARR_0_API_KEY`: Radarr API key
 - `UN_READARR_0_API_KEY`: Readarr API key
 - `UN_SONARR_0_API_KEY`: Sonarr API key
+- ~~`VANITY_AGE_ARGUMENTS`: A RegEx that you would like to find at the beginning of a `age` public key (e.g. "\d+j0hn\d?wyles.*")~~
 - `VPN_PASS`: VPN password for your VPN provider
 - `VPN_SERVICE_PROVIDER`: Gluetun VPN service provider (e.g. `private internet access` for Private Internet Access VPN, `nordvpn` for NordVPN, etc.)
 - `VPN_USER`: VPN username for your VPN provider
@@ -371,6 +392,8 @@ _relative_ to the container (i.e. **not** the actual location of the files on
 - **P1:** Add instructions for Gluetun containers to replace those found below.
 - **P2:** Add `ports` and whatever else from `docker-compose-*.yaml` files to be
   passed as ENV variables.
+- **P3:** Add `rana` and `vanity-age` executables, Docker build instructions, and
+  `docker compose` running instructions
 
 ### TODO: Change This to Gluetun Instructions
 

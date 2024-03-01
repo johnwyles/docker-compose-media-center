@@ -17,8 +17,8 @@ services:
     networks:
       - media
     entrypoint: "/app/target/release/rana"
-    command: ${RANA_COMMAND} # -n=j0hnwyles,j0hnwyl3s -c 4
-    restart: unless-stopped
+    command: ${RANA_ARGUMENTS} # -n=j0hnwyles,j0hnwyl3s -c 4
+    restart: "no"
 
   vanity-age:
     image: vanity-age:latest
@@ -32,13 +32,12 @@ services:
     networks:
       - media
     entrypoint: /app/vanity-age
-    command: "${VANITY_AGE_COMMAND}" # '\d+j0hn\d?wyles.*'
+    command: '${VANITY_AGE_ARGUMENTS}' # '\d+j0hn\d?wyles.*'
     restart: "no"
 
 networks:
   media:
     name: media
-    # external: true
     driver: bridge
     driver_opts:
       com.docker.network.bridge.enable_icc: "true"
