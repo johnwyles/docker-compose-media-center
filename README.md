@@ -393,6 +393,7 @@ _relative_ to the container (i.e. **not** the actual location of the files on
 - **P1:** Add instructions for Gluetun containers to replace those found below
 - **P2:** Add `ports` and whatever else from `docker-compose-*.yaml` files to be
   passed as ENV variables
+- **P3:** See if SearXNG needs more tuning and spend some time with it
 - **P3:** Add `rana` and `vanity-age` executables, Docker build instructions, and
   `docker compose` running instructions
 
