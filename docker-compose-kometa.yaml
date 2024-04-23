@@ -4,23 +4,23 @@
 version: "3.7"
 
 services:
-  plexmetamanager:
-    image: lscr.io/linuxserver/plex-meta-manager:latest
-    container_name: plexmetamanager
-    hostname: plexametamanager
+  kometa:
+    image: kometateam/kometa:latest
+    container_name: kometa
+    hostname: kometa
     environment:
       - PGID=${PGID}
-      - PMM_PLEX_TOKEN=${PMM_PLEX_TOKEN}
-      - PMM_PLEX_URL=${PMM_PLEX_URL}
-      - PMM_RUN=True
-      - PMM_TIME=
+      - KOMETA_PLEX_TOKEN=${KOMETA_PLEX_TOKEN}
+      - KOMETA_PLEX_URL=${KOMETA_PLEX_URL}
+      - KOMETA_RUN=True
+      - KOMETA_TIME=
       - PUID=${PUID}
       - UMASK=${UMASK}
     networks:
       - media
     volumes:
-      - ${CONFIG_BASE_DIR}/plexmetamanager:/config
-    restart: "no"
+      - ${CONFIG_BASE_DIR}/kometa:/config
+    restart: no
 
 networks:
   media:

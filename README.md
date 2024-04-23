@@ -298,6 +298,9 @@ variables and their purpose:
 - `HEALTH_CHECK_HOST`: Hostname to use for VPN health checks (e.g.:
   `google.com`)
 - `IP_RANGE`: IP range for the Docker Compose subnet
+- `KOMETA_PLEX_TOKEN`: The Plex claim ID from above but without the `claim-` prefix
+- `KOMETA_PLEX_URL`: The internal Docker URL for the plex container for use by Kometa (previously: Plex
+  Meta Manager) (e.g. (and probably should not change) `http://plex:32400`)
 - `LAN_NETWORK`: Private IP network the Docker Compose subnet is attached to on
   you private LAN (e.g. `192.168.0.0/24` => `192.168.0.1`: router, `192.168.0.5`:
   NAS machine, `192.168.0.88`: Laptop, etc.)
@@ -327,9 +330,6 @@ variables and their purpose:
   disk e.g. `/personal` => `${PERSONAL_DIR_LOCAL}` e.g. `/personal` => `/volume1/personal/videos`)
 - `PLEX_CLAIM`: The Plex claim ID received from <https://plex.tv/claim> when
   first starting the Plex service
-- `PMM_PLEX_TOKEN`: The Plex claim ID from above but without the `claim-` prefix
-- `PMM_PLEX_URL`: The internal Docker URL for the plex container for use by Plex
-  Meta Manager (e.g. (and probably should not change) `http://plex:32400`)
 - `PRIVATE_INTERNET_ACCESS_VPN_PORT_FORWARDING`: Gluetun VPN killswitch setting for port forward with Private Internet Access (i.e. `on` or `off`)
 - ~~`RANA_ARGUMENTS`: Arguments to pass in `rana` on execution to find a prefixed sub-string(s) (e.g. "-n=j0hnwyles,j0hnwyl3s -c 4")~~
 - `SERVER_COUNTRIES`: Gluetun VPN killswitch setting for the regions to use (e.g. `Switzerland,Estonia,Iceland,Panama,Romania`)
