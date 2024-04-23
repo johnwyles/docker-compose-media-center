@@ -1,8 +1,8 @@
 # docker-compose-media-center
 
-This respository contains the Docker compose files for standing up an entire
-Servarr stack along with a few other supporting tools and services best suited
-for an at-home NAS or media center machine.
+This respository contains the Docker compose files for standing up an entire Servarr
+stack along with a other supporting tools and services best suited for an at-home
+NAS or media center
 
 **Table of contents:**
 - [docker-compose-media-center](#docker-compose-media-center)
