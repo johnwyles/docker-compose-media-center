@@ -7,6 +7,22 @@
 version: "3.7"
 
 services:
+  iperf3:
+    image: networkstatic/iperf3
+    container_name: iperf3
+    hostname: iperf3
+    environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    ports:
+      - 5201:5201
+    command: '--server'
+    restart: "no"
+
   # photoprism:
   #   ## Use photoprism/photoprism:preview for testing preview builds:
   #   image: photoprism/photoprism:latest
