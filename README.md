@@ -437,6 +437,7 @@ _relative_ to the container (i.e. **not** the actual location of the files on
 - **P3:** Add `rana` and `vanity-age` executables, Docker build instructions, and
   `docker compose` running instructions
 - **P3:** Figure out searxng
+- **P3:** Add documentation or maybe breakout Home Assistant
 
 ### TODO: Change This to Gluetun Instructions
 
