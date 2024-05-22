@@ -14,7 +14,8 @@ NAS or media center
     - [`docker-compose-downloaders.yaml`](#docker-compose-downloadersyaml)
     - [`docker-compose-stararr.yaml`](#docker-compose-stararryaml)
     - [`docker-compose-plex.yaml`](#docker-compose-plexyaml)
-    - [`docker-compose-plexmetamanager.yaml`](#docker-compose-plexmetamanageryaml)
+    - [`docker-compose-kometa.yaml`](#docker-compose-kometayaml)
+    - [`docker-compose-homeassistant.yaml`](#docker-compose-homeassistantyaml)
   - [Installation and Setup](#installation-and-setup)
   - [Directory Structure](#directory-structure)
   - [Environment Variables](#environment-variables)
@@ -59,7 +60,9 @@ associated Docker image sources, GitHub repositories, or
   managing the remaining "Stacks" (docker-compose files).
 
 ### `docker-compose-tools.yaml`
-
+- [iperf]([iperf3](https://github.com/esnet/iperf)): A utility used to test
+  speeds between two machines. Both a client and server tool in one. In this
+  case we will run the container in server mode.
 - [SearXNG](https://github.com/searxng/searxng-docker): Utility for an internet
   metasearch engine that aggregates search results.
 - [Syncthing](https://github.com/linuxserver/docker-syncthing): Utility for
@@ -139,14 +142,25 @@ container I wanted to up to it.
 - [Overseerr](https://github.com/linuxserver/docker-overseerr): Overseer for
   browsing and discovering of new media.
 
-### `docker-compose-plexmetamanager.yaml`
+### `docker-compose-kometa.yaml`
 
-- [Plex Meta Manager](https://github.com/linuxserver/docker-plex-meta-manager):
-A fairly complex piece of software to render badges, evaluate audience/user/critic
-ratings, creat/manage collections, and a whole host of many other things. The best
-way to get started is probably seeing some explanations and visuals on the
-[Plex Meta Manager main GitHub page](https://github.com/meisnate12/Plex-Meta-Manager)
-as well as on the [Plex Meta Manager wiki page](https://metamanager.wiki/en/latest/home/).
+- [Kometa](https://github.com/Kometa-Team/Kometa): A fairly complex piece of
+  software to render badges, evaluate audience/user/critic ratings, creat/manage
+  collections, and a whole host of many other things. The best way to get
+  started is probably seeing some explanations and visuals on the on the 
+  [Kometa wiki page](https://metamanager.wiki/en/latest/).
+
+### `docker-compose-homeassistant.yaml`
+
+- [Home Assistant](https://www.home-assistant.io/installation/linux#docker-compose):
+  This is not only the popular open-source home automation suite, Home Assistant,
+  but also a number of tools and services that compliment it. This file will
+  likely be *heavily* modified from the boiler plate file included here. I have
+  made extensive comments as to what each service is and I assure you your setup
+  will largely differ. This is just a collection of how I have set up my home
+  automation using Home Assistant and hopefully can be of some help to you. I
+  will continue to update it as genericly as I can so it hopefully is of
+  greater use as a jumping off point.
 
 ## Installation and Setup
 
@@ -297,6 +311,28 @@ variables and their purpose:
 - `GATEWAY_IP`: Gateway IP for the Docker Compose subnet (e.g. `172.16.0.1`)
 - `HEALTH_CHECK_HOST`: Hostname to use for VPN health checks (e.g.:
   `google.com`)
+- `HOMEASSISTANT_PGID`:  The group ID for the running process in the container
+  environment (e.g. `1000`)
+- `HOMEASSISTANT_PUID`: The user ID for the running process in the container
+  environment (e.g. `1000`)
+- `HOMEASSISTANT_DATA_DIR_1_LOCAL`: The directory to of data files we would like
+  exposed to Home Assistant locally on disk (i.e. `/tmp`)
+- `HOMEASSISTANT_DATA_DIR_2_LOCAL`: The directory to of data files we would like
+  exposed to Home Assistant locally on disk (i.e. `/etc`)
+- `HOMEASSISTANT_DATA_DIR_3_LOCAL`: The directory to of data files we would like
+  exposed to Home Assistant locally on disk (i.e. `/mnt`)
+- `HOMEASSISTANT_DATA_DIR_1_RELATIVE`: The directory to we house data files
+- _relative_ to the container (i.e. **not** the actual location of the
+  files on disk e.g. `/foo_tmp` => `${HOMEASSISTANT_DATA_DIR_1_LOCAL}` e.g.
+  `/foo_tmp` => `/tmp`)
+- `HOMEASSISTANT_DATA_DIR_2_RELATIVE`: The directory to we house data files
+- _relative_ to the container (i.e. **not** the actual location of the
+  files on disk e.g. `/etc_tmp` => `${HOMEASSISTANT_DATA_DIR_2_LOCAL}` e.g.
+  `/etc_tmp` => `/etc`)
+- `HOMEASSISTANT_DATA_DIR_3_RELATIVE`: The directory to we house data files
+- _relative_ to the container (i.e. **not** the actual location of the
+  files on disk e.g. `/mnt_tmp` => `${HOMEASSISTANT_DATA_DIR_3_LOCAL}` e.g.
+  `/mnt_tmp` => `/mnt`)
 - `IP_RANGE`: IP range for the Docker Compose subnet
 - `KOMETA_PLEX_TOKEN`: The Plex claim ID from above but without the `claim-` prefix
 - `KOMETA_PLEX_URL`: The internal Docker URL for the plex container for use by Kometa (previously: Plex
@@ -328,6 +364,10 @@ variables and their purpose:
 - `PERSONAL_DIR_RELATIVE`: The directory where Personal videos files that are organized
   _relative_ to the container (i.e. **not** the actual location of the files on
   disk e.g. `/personal` => `${PERSONAL_DIR_LOCAL}` e.g. `/personal` => `/volume1/personal/videos`)
+- `PGID`: The group ID for the running process in the container environment
+  (e.g. `1000`)
+- `PUID`: The user ID for the running process in the container environment
+- (e.g. `1000`)
 - `PLEX_CLAIM`: The Plex claim ID received from <https://plex.tv/claim> when
   first starting the Plex service
 - `PRIVATE_INTERNET_ACCESS_VPN_PORT_FORWARDING`: Gluetun VPN killswitch setting for port forward with Private Internet Access (i.e. `on` or `off`)

@@ -1,0 +1,33 @@
+# ||--------------------------------------------------------------------------------||
+# ||                                  Home Assistant                                ||
+# ||--------------------------------------------------------------------------------||
+
+version: "3.7"
+
+services:
+  homeassistant:
+    container_name: homeassistant
+    hostname: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    environment:
+      - PGID=${HOMEASSISTANT_PGID}
+      - PUID=${HOMEASSISTANT_PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    # cap_add:
+    #   - NET_ADMIN
+    #   - NET_RAW
+    #   - SYS_MODULE
+    privileged: true
+    network_mode: host
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyUSB1:/dev/ttyUSB1
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+      - ${HOMEASSISTANT_DATA_DIR_1_LOCAL}:${HOMEASSISTANT_DATA_DIR_1_RELATIVE}
+      - ${HOMEASSISTANT_DATA_DIR_2_LOCAL}:${HOMEASSISTANT_DATA_DIR_2_RELATIVE}
+      - ${HOMEASSISTANT_DATA_DIR_3_LOCAL}:${HOMEASSISTANT_DATA_DIR_3_RELATIVE}
+      - ${HOMEASSISTANT_CONFIG_BASE_DIR}/homeassistant:/config
+    restart: unless-stopped
