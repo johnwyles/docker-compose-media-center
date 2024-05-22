@@ -396,6 +396,7 @@ _relative_ to the container (i.e. **not** the actual location of the files on
 - **P3:** See if SearXNG needs more tuning and spend some time with it
 - **P3:** Add `rana` and `vanity-age` executables, Docker build instructions, and
   `docker compose` running instructions
+- **P3:** Figure out searxng
 
 ### TODO: Change This to Gluetun Instructions
 
