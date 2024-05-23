@@ -20,8 +20,7 @@ NAS or media center
   - [Directory Structure](#directory-structure)
   - [Environment Variables](#environment-variables)
   - [TODO](#todo)
-    - [TODO: Change This to Gluetun Instructions](#todo-change-this-to-gluetun-instructions)
-      - [~~Transmission OpenVPN Setup~~](#transmission-openvpn-setup)
+    - [TODO: Add Gluetun Instructions](#todo-add-gluetun-instructions)
 
 
 ## Useful Resources To Have On-hand
@@ -320,10 +319,11 @@ variables and their purpose:
   persistently stored between reboots, restarts, etc. (e.g.
   `/volume1/homeassistant-docker`)... and will serve the container the directory
   (e.g. _NodeRED_ => `/volume1/homeassistant-docker`/nodered, _ZigBee_ =>
-  `/volume1/homeassistant-docker`/zigbee, etc.) =>
-  (e.g. NodeRED => `deluge`, ZigBee => `zigbee`, etc.). So, in this example, it
-  is simply the home where each of these containers configurations will live:
-  `/volume1/homeassistant-docker`.
+  `/volume1/homeassistant-docker`/zigbee, _Home Assistant_ => 
+  `/volume1/homeassistant-docker`/homeassistant, etc.) =>  (e.g. NodeRED =>
+  `nodered`, ZigBee => `zigbee`, Home Assistant => `homeassistant`, etc.). So,
+  in this example, it is simply the home where each of these containers
+  configurations will live: `/volume1/homeassistant-docker`
 - `HOMEASSISTANT_DATA_DIR_1_LOCAL`: The directory to of data files we would like
   exposed to Home Assistant locally on disk (i.e. `/tmp`)
 - `HOMEASSISTANT_DATA_DIR_2_LOCAL`: The directory to of data files we would like
