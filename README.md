@@ -281,7 +281,7 @@ variables and their purpose:
   disk e.g. `/books` => `${BOOKS_DIR_LOCAL}` e.g. `/comics` => `/volume1/comics`)
 - `CONFIG_BASE_DIR`: The base directory where each of the containers will have
   their configurations persistently stored between reboots, restarts, etc. (e.g.
-  `/volume1/docker`... and will serve the container the directory (e.g.
+  `/volume1/docker`)... and will serve the container the directory (e.g.
   _Deluge_ => `/volume1/docker`/deluge, _Plex_ =>
   `/volume1/docker`/plex, _Tailscale_ => `/volume1/docker`/tailscale, etc.) =>
   (e.g. Deluge => `deluge`, Plex => `plex`,
@@ -315,6 +315,15 @@ variables and their purpose:
   environment (e.g. `1000`)
 - `HOMEASSISTANT_PUID`: The user ID for the running process in the container
   environment (e.g. `1000`)
+- `HOMEASSISTANT_CONFIG_BASE_DIR`: The _base_ directory where each of the
+  containers for and support Home Assistant will have their configurations
+  persistently stored between reboots, restarts, etc. (e.g.
+  `/volume1/homeassistant-docker`)... and will serve the container the directory
+  (e.g. _NodeRED_ => `/volume1/homeassistant-docker`/nodered, _ZigBee_ =>
+  `/volume1/homeassistant-docker`/zigbee, etc.) =>
+  (e.g. NodeRED => `deluge`, ZigBee => `zigbee`, etc.). So, in this example, it
+  is simply the home where each of these containers configurations will live:
+  `/volume1/homeassistant-docker`.
 - `HOMEASSISTANT_DATA_DIR_1_LOCAL`: The directory to of data files we would like
   exposed to Home Assistant locally on disk (i.e. `/tmp`)
 - `HOMEASSISTANT_DATA_DIR_2_LOCAL`: The directory to of data files we would like
