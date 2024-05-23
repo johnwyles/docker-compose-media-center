@@ -448,21 +448,7 @@ _relative_ to the container (i.e. **not** the actual location of the files on
 - **P3:** Figure out searxng
 - **P3:** Add documentation or maybe breakout Home Assistant
 
-### TODO: Change This to Gluetun Instructions
-
-#### ~~Transmission OpenVPN Setup~~
-
-~~Even if you are not using Transmission for your torrent download client (I
-personally use Deluge) I found the container comes up much faster than the
-DelugeVPN project and it also is more stable of a connection between both the
-containers using it as well as with the VPN provider. Additionally the
-Transmission OpenVPN project is more friendly for selecting multipule VPN
-servers as well as configuration. Below is an example with Private Internet
-Access but the project supports _many_ other services (which again is also why
-I did not like the DelugeVPN project). You'll want to follow similar steps for
-whichever provider you have chosen. However, the end goal is to get all of your
-OpenVPN `.ovpn` files downloaded in the Transmission OpenvVPN containers
-configuration directory under the directory `openvpn`:~~
+### TODO: Add Gluetun Instructions
 
 ```shell
 pushd ${CONFIG_BASE_DIR}/transmission-openvpn/
