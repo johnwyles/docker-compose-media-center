@@ -14,11 +14,6 @@ services:
       - PUID=${HOMEASSISTANT_PUID}
       - TZ=${TZ}
       - UMASK=${UMASK}
-      - HOMEASSISTANT_CONFIG_BASE_DIR
-    # cap_add:
-    #   - NET_ADMIN
-    #   - NET_RAW
-    #   - SYS_MODULE
     privileged: true
     network_mode: host
     devices:
@@ -26,7 +21,8 @@ services:
       - /dev/ttyUSB1:/dev/ttyUSB1
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /run/dbus:/run/dbus:ro
+      # TODO: THIS IS BRAKING BLUETOOTH SUPPORT (RPI4 - DO WE EVEN NEED IT?)
+      # - /run/dbus:/run/dbus:ro
       - ${HOMEASSISTANT_DATA_DIR_1_LOCAL}:${HOMEASSISTANT_DATA_DIR_1_RELATIVE}
       - ${HOMEASSISTANT_DATA_DIR_2_LOCAL}:${HOMEASSISTANT_DATA_DIR_2_RELATIVE}
       - ${HOMEASSISTANT_DATA_DIR_3_LOCAL}:${HOMEASSISTANT_DATA_DIR_3_RELATIVE}
