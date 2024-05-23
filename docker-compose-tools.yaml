@@ -162,18 +162,12 @@ services:
       - PUID=${PUID}
       - TZ=${TZ}
       - UMASK=${UMASK}
-    networks:
-      - media
+    network_mode: host
     volumes:
       - ${CONFIG_DATA_DIR}:/downloads
       - ${CONFIG_BASE_DIR}/syncthing:/config
       - ${SYNCTHING_MOUNT_DIR_1_LOCAL}:${SYNCTHING_MOUNT_DIR_1_RELATIVE}
       - ${SYNCTHING_MOUNT_DIR_2_LOCAL}:${SYNCTHING_MOUNT_DIR_2_RELATIVE}
-    ports:
-      - 8384:8384
-      - 22000:22000/udp
-      - 22000:22000/tcp
-      - 21027:21027/udp
     restart: unless-stopped
 
   tailscale:
