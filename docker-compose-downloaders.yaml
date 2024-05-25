@@ -51,9 +51,9 @@ services:
       - gluetun
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-      - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+      - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
       - ${CONFIG_BASE_DIR}/deluge:/config
     restart: unless-stopped
 
@@ -90,9 +90,9 @@ services:
   #     - 58946:58946/udp
   #   volumes:
   #     - /etc/localtime:/etc/localtime:ro
-  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
   #     - ${CONFIG_BASE_DIR}/delugevpn:/config
   #   restart: unless-stopped
 
@@ -111,9 +111,9 @@ services:
   #   # network_mode: "service:transmission-openvpn"
   #   volumes:
   #     - /etc/localtime:/etc/localtime:ro
-  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
   #     - ${CONFIG_BASE_DIR}/nzbget:/config
   #   ports:
   #     # nzbget
@@ -150,9 +150,9 @@ services:
   #   # network_mode: "service:transmission-openvpn"
   #   volumes:
   #     - /etc/localtime:/etc/localtime:ro
-  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
   #     - ${CONFIG_BASE_DIR}/nzbgetvpn:/config
   #   ports:
   #     # nzbget
@@ -173,9 +173,9 @@ services:
       - gluetun
     volumes:
       - ${CONFIG_BASE_DIR}/qbittorrent:/config
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-      - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+      - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
     restart: unless-stopped
 
   sabnzbd:
@@ -190,9 +190,9 @@ services:
     depends_on:
       - gluetun
     volumes:
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-      - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+      - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
       - ${CONFIG_BASE_DIR}/sabnzbd:/config
     restart: unless-stopped
 
@@ -244,9 +244,9 @@ services:
   #     - 51413:51413/udp
   #   volumes:
   #     - /etc/localtime:/etc/localtime:ro
-  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
   #     - ${CONFIG_BASE_DIR}/sabnzbdvpn:/config
   #   restart: unless-stopped
 
@@ -265,8 +265,8 @@ services:
       - PEERPORT=
       - PGID=${PGID}
       - PUID=${PUID}
-      - TRANSMISSION_DOWNLOAD_DIR=${DATA_DIR_COMPLETE_RELATIVE}
-      - TRANSMISSION_INCOMPLETE_DIR=${DATA_DIR_INCOMPLETE_RELATIVE}
+      - TRANSMISSION_DOWNLOAD_DIR=${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+      - TRANSMISSION_INCOMPLETE_DIR=${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
 
       # (optional) Download the ZIP file below and extract the contents to
       # "flood-for-transmission" in the "[CONFIG_BASE_DIR]/transmission" location: 
@@ -286,9 +286,9 @@ services:
       - gluetun
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-      - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+      - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
       - ${CONFIG_BASE_DIR}/transmission:/config
     restart: unless-stopped
 
@@ -317,8 +317,8 @@ services:
   #     - PEER_DNS_PIN_ROUTES=false
   #     - PGID=${PGID}
   #     - PUID=${PUID}
-  #     - TRANSMISSION_DOWNLOAD_DIR=${DATA_DIR_COMPLETE_RELATIVE}
-  #     - TRANSMISSION_INCOMPLETE_DIR=${DATA_DIR_INCOMPLETE_RELATIVE}
+  #     - TRANSMISSION_DOWNLOAD_DIR=${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+  #     - TRANSMISSION_INCOMPLETE_DIR=${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
   #     - TRANSMISSION_WEB_UI=flood-for-transmission
   #     - TZ=${TZ}
   #     - UFW_ALLOW_GW_NET=true
@@ -333,9 +333,9 @@ services:
   #     - media
   #   command: [ "dumb-init", "/entrypoint.sh", "/etc/openvpn/start.sh" ]
   #   volumes:
-  #     - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-  #     - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
-  #     - ${DATA_DIR_WATCH_LOCAL}:${DATA_DIR_WATCH_RELATIVE}
+  #     - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
   #     - ${CONFIG_BASE_DIR}/transmission-openvpn:/config
   #     - ${CONFIG_BASE_DIR}/transmission-openvpn/entrypoint.sh:/entrypoint.sh
   #     - ${CONFIG_BASE_DIR}/transmission-openvpn/openvpn:/etc/openvpn/custom
@@ -370,12 +370,12 @@ services:
       - UN_FOLDER_0_EXTRACT_ISOS=true
       - UN_FOLDER_0_EXTRACT_PATH=
       - UN_FOLDER_0_MOVE_BACK=false
-      - UN_FOLDER_0_PATH=${DATA_DIR_COMPLETE_RELATIVE}
+      - UN_FOLDER_0_PATH=${DOWNLOADS_DIR_COMPLETE_RELATIVE}
       - UN_INTERVAL=2m
       - UN_LIDARR_0_API_KEY=${UN_LIDARR_0_API_KEY}
       - UN_LIDARR_0_DELETE_DELAY=5m
       - UN_LIDARR_0_DELETE_ORIG=false
-      - UN_LIDARR_0_PATHS_0=${DATA_DIR_COMPLETE_RELATIVE}
+      - UN_LIDARR_0_PATHS_0=${DOWNLOADS_DIR_COMPLETE_RELATIVE}
       - UN_LIDARR_0_PROTOCOLS=torrent,usenet
       - UN_LIDARR_0_TIMEOUT=10s
       - UN_LIDARR_0_URL=http://lidarr:8686
@@ -387,14 +387,14 @@ services:
       - UN_RADARR_0_API_KEY=${UN_RADARR_0_API_KEY}
       - UN_RADARR_0_DELETE_DELAY=5m
       - UN_RADARR_0_DELETE_ORIG=false
-      - UN_RADARR_0_PATHS_0=${DATA_DIR_COMPLETE_RELATIVE}
+      - UN_RADARR_0_PATHS_0=${DOWNLOADS_DIR_COMPLETE_RELATIVE}
       - UN_RADARR_0_PROTOCOLS=torrent,usenet
       - UN_RADARR_0_TIMEOUT=10s
       - UN_RADARR_0_URL=http://radarr:7878
       - UN_READARR_0_API_KEY=${UN_READARR_0_API_KEY}
       - UN_READARR_0_DELETE_DELAY=5m
       - UN_READARR_0_DELETE_ORIG=false
-      - UN_READARR_0_PATHS_0=${DATA_DIR_COMPLETE_RELATIVE}
+      - UN_READARR_0_PATHS_0=${DOWNLOADS_DIR_COMPLETE_RELATIVE}
       - UN_READARR_0_PROTOCOLS=torrent,usenet
       - UN_READARR_0_TIMEOUT=10s
       - UN_READARR_0_URL=http://readarr:8787
@@ -402,7 +402,7 @@ services:
       - UN_SONARR_0_API_KEY=${UN_SONARR_0_API_KEY}
       - UN_SONARR_0_DELETE_DELAY=5m
       - UN_SONARR_0_DELETE_ORIG=false
-      - UN_SONARR_0_PATHS_0=${DATA_DIR_COMPLETE_RELATIVE}
+      - UN_SONARR_0_PATHS_0=${DOWNLOADS_DIR_COMPLETE_RELATIVE}
       - UN_SONARR_0_PROTOCOLS=torrent,usenet
       - UN_SONARR_0_TIMEOUT=10s
       - UN_SONARR_0_URL=http://sonarr:8989
@@ -431,7 +431,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
     restart: unless-stopped
 
 networks:

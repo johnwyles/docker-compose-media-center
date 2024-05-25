@@ -285,28 +285,24 @@ variables and their purpose:
   `/volume1/docker`/plex, _Tailscale_ => `/volume1/docker`/tailscale, etc.) =>
   (e.g. Deluge => `deluge`, Plex => `plex`,
   Tailscale => `tailscale`, etc.)
-- `CONFIG_DATA_DIR`: The directory for each of the containers to store their
-  data persistently stored between reboots, restarts, etc. (e.g.
-  `/volume1/Data`... will serve the data directories for e.g. `complete`,
-  `incomplete`, and `watch` for Deluge)
-- `DATA_DIR_COMPLETE_LOCAL`: The directory to keep completely downloaded
-  files locally on disk (i.e. `/volume1/data/complete`)
-- `DATA_DIR_COMPLETE_RELATIVE`: The directory to keep completely downloaded
+- `DOWNLOADS_DIR_COMPLETE_LOCAL`: The directory to keep completely downloaded
+  files locally on disk (i.e. `/volume1/Downloads/complete`)
+- `DOWNLOADS_DIR_COMPLETE_RELATIVE`: The directory to keep completely downloaded
   files _relative_ to the container (i.e. **not** the actual location of the
-  files on disk e.g. `/complete` => `${DATA_DIR_COMPLETE_LOCAL}` e.g.
-  `/complete` => `/volume1/data/complete`)
-- `DATA_DIR_INCOMPLETE_LOCAL`: The directory to keep incompletely downloaded
-  files locally on disk (i.e. `/volume1/data/incomplete`)
-- `DATA_DIR_INCOMPLETE_RELATIVE`: The directory to keep incompletely downloaded
+  files on disk e.g. `/complete` => `${DOWNLOADS_DIR_COMPLETE_LOCAL}` e.g.
+  `/complete` => `/volume1/Downloads/complete`)
+- `DOWNLOADS_DIR_INCOMPLETE_LOCAL`: The directory to keep incompletely downloaded
+  files locally on disk (i.e. `/volume1/Downloads/incomplete`)
+- `DOWNLOADS_DIR_INCOMPLETE_RELATIVE`: The directory to keep incompletely downloaded
   files _relative_ to the container (i.e. **not** the actual location of the
-  files on disk e.g. `/incomplete` => `${DATA_DIR_INCOMPLETE_LOCAL}` e.g.
-  `/incomplete` => `/volume1/data/watch`)
-- `DATA_DIR_WATCH_LOCAL`: The directory to keep files to be watched
-  locally on disk (i.e. `/volume1/data/watch`)
-- `DATA_DIR_WATCH_RELATIVE`: The directory to keep files to be watched
+  files on disk e.g. `/incomplete` => `${DOWNLOADS_DIR_INCOMPLETE_LOCAL}` e.g.
+  `/incomplete` => `/volume1/Downloads/watch`)
+- `DOWNLOADS_DIR_WATCH_LOCAL`: The directory to keep files to be watched
+  locally on disk (i.e. `/volume1/Downloads/watch`)
+- `DOWNLOADS_DIR_WATCH_RELATIVE`: The directory to keep files to be watched
   _relative_ to the container (i.e. **not** the actual location of the files on
-  disk e.g. `/watch` => `${DATA_DIR_WATCH_LOCAL}` e.g. `/watch` =>
-  `/volume1/data/watch`)
+  disk e.g. `/watch` => `${DOWNLOADS_DIR_WATCH_LOCAL}` e.g. `/watch` =>
+  `/volume1/Downloads/watch`)
 - `GATEWAY_IP`: Gateway IP for the Docker Compose subnet (e.g. `172.16.0.1`)
 - `HEALTH_CHECK_HOST`: Hostname to use for VPN health checks (e.g.:
   `google.com`)

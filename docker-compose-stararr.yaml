@@ -1,7 +1,7 @@
 # ||--------------------------------------------------------------------------------||
 # ||                              StarArr Applications                              ||
 # ||--------------------------------------------------------------------------------||
-version: "3.6"
+version: "3.7"
 
 services:
   bazarr:
@@ -39,8 +39,8 @@ services:
     volumes:
       - ${CONFIG_BASE_DIR}/lidarr:/config
       - ${MUSIC_DIR_LOCAL}:${MUSIC_DIR_RELATIVE}
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
     restart: unless-stopped
 
   mylar3:
@@ -57,8 +57,8 @@ services:
     volumes:
       - ${CONFIG_BASE_DIR}/mylar3:/config
       - ${COMICS_DIR_LOCAL}:${COMICS_DIR_RELATIVE}
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
     ports:
       - 8090:8090
     restart: unless-stopped
@@ -112,8 +112,8 @@ services:
     volumes:
       - ${MOVIES_DIR_LOCAL}:${MOVIES_DIR_RELATIVE}
       - ${CONFIG_BASE_DIR}/radarr:/config
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
     ports:
       - 7878:7878
     restart: unless-stopped
@@ -132,8 +132,8 @@ services:
     volumes:
       - ${BOOKS_DIR_LOCAL}:${BOOKS_DIR_RELATIVE}
       - ${CONFIG_BASE_DIR}/readarr:/config
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
     ports:
       - 8787:8787
     restart: unless-stopped
@@ -152,8 +152,8 @@ services:
     volumes:
       - ${TV_DIR_LOCAL}:${TV_DIR_RELATIVE}
       - ${CONFIG_BASE_DIR}/sonarr:/config
-      - ${DATA_DIR_COMPLETE_LOCAL}:${DATA_DIR_COMPLETE_RELATIVE}
-      - ${DATA_DIR_INCOMPLETE_LOCAL}:${DATA_DIR_INCOMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+      - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
     ports:
       - 8989:8989
     restart: unless-stopped
