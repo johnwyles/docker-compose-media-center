@@ -1,7 +1,7 @@
 # ||--------------------------------------------------------------------------------||
 # ||                            Downloading Applications                            ||
 # ||--------------------------------------------------------------------------------||
-version: "3.7"
+version: "3.9"
 
 services:
   gluetun:
@@ -194,6 +194,21 @@ services:
       - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
       - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
       - ${CONFIG_BASE_DIR}/sabnzbd:/config
+    restart: unless-stopped
+
+  sabnzbd-exporter:
+    image: ghcr.io/onedr0p/exportarr:v2.0
+    container_name: sabnzbd-exporter
+    hostname: sabnzbd-exporter
+    environment:
+      PORT: 9711
+      URL: http://sabnzbd:8080
+      APIKEY: ${SABNZBD_API_KEY}
+    networks:
+      - media
+    ports:
+      - 9711:9711
+    command: ["sabnzbd"]
     restart: unless-stopped
 
   # sabnzbdvpn:
@@ -407,7 +422,10 @@ services:
       - UN_SONARR_0_TIMEOUT=10s
       - UN_SONARR_0_URL=http://sonarr:8989
       - UN_START_DELAY=1m
-      # TODO: Add or remove these
+      - UN_WEBSERVER_METRICS=true
+      # - UN_WEBSERVER_LISTEN_ADDR=0.0.0.0:5656
+      # - UN_WEBSERVER_URLBASE=/unpackerr_metrics
+      # TODO: Add Notifiarr for webhook
       # - UN_CMDHOOK_0_COMMAND=
       # - UN_CMDHOOK_0_EVENTS_0=0
       # - UN_CMDHOOK_0_EXCLUDE_0=
@@ -432,11 +450,14 @@ services:
       - no-new-privileges:true
     volumes:
       - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+    ports:
+      - 5656:5656
     restart: unless-stopped
 
 networks:
   media:
     name: media
+    external: true
     driver: bridge
     driver_opts:
       com.docker.network.bridge.enable_icc: "true"

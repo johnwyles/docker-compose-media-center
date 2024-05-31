@@ -2,70 +2,45 @@
 # ||                               Other Applications                               ||
 # ||--------------------------------------------------------------------------------||
 
-# TODO: Should ALL services have "depends_on" gluetun?
-
-version: "3.7"
+version: "3.9"
 
 services:
+  grafana_postgres:
+    image: postgres:16-alpine
+    container_name: grafana_postgres
+    hostname: grafana-postgres
+    environment:
+      - POSTGRES_DB=${GRAFANA_DATABASE_NAME}
+      - POSTGRES_USER=${GRAFANA_DATABASE_USER}
+      - POSTGRES_PASSWORD=${GRAFANA_DATABASE_PASSWORD}
+    networks:
+      - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/grafana/database:/var/lib/postgresql/data
+    restart: unless-stopped
 
-# TODO: Add immich after you have studied it
-#
-#   immich-server:
-#     container_name: immich_server
-#     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
-#     volumes:
-#       - ${UPLOAD_LOCATION}:/usr/src/app/upload
-#       - /etc/localtime:/etc/localtime:ro
-#     env_file:
-#       - .env
-#     ports:
-#       - 2283:3001
-#     depends_on:
-#       - redis
-#       - database
-#     restart: always
-
-#   immich-machine-learning:
-#     container_name: immich_machine_learning
-#     # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
-#     # Example tag: ${IMMICH_VERSION:-release}-cuda
-#     image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
-#     # extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
-#     #   file: hwaccel.ml.yml
-#     #   service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
-#     volumes:
-#       - model-cache:/cache
-#     env_file:
-#       - .env
-#     restart: always
-
-#   redis:
-#     container_name: immich_redis
-#     image: docker.io/redis:6.2-alpine@sha256:e31ca60b18f7e9b78b573d156702471d4eda038803c0b8e6f01559f350031e93
-#     healthcheck:
-#       test: redis-cli ping || exit 1
-#     restart: always
-
-#   database:
-#     container_name: immich_postgres
-#     image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
-#     environment:
-#       POSTGRES_PASSWORD: ${DB_PASSWORD}
-#       POSTGRES_USER: ${DB_USERNAME}
-#       POSTGRES_DB: ${DB_DATABASE_NAME}
-#       POSTGRES_INITDB_ARGS: '--data-checksums'
-#     volumes:
-#       - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
-#     healthcheck:
-#       test: pg_isready --dbname='${DB_DATABASE_NAME}' || exit 1; Chksum="$$(psql --dbname='${DB_DATABASE_NAME}' --username='${DB_USERNAME}' --tuples-only --no-align --command='SELECT SUM(checksum_failures) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
-#       interval: 5m
-#       start_interval: 30s
-#       start_period: 5m
-#     command: ["postgres", "-c" ,"shared_preload_libraries=vectors.so", "-c", 'search_path="$$user", public, vectors', "-c", "logging_collector=on", "-c", "max_wal_size=2GB", "-c", "shared_buffers=512MB", "-c", "wal_compression=on"]
-#     restart: always
-
-# volumes:
-#   model-cache:
+  grafana:
+    image: grafana/grafana-enterprise:latest
+    container_name: grafana
+    hostname: grafana
+    user: root
+    depends_on:
+      - grafana_postgres
+    environment:
+      - GF_DATABASE_TYPE=postgres
+      - GF_DATABASE_HOST=grafana_postgres
+      - GF_DATABASE_NAME=${GRAFANA_DATABASE_NAME}
+      - GF_DATABASE_USER=${GRAFANA_DATABASE_USER}
+      - GF_DATABASE_PASSWORD=${GRAFANA_DATABASE_PASSWORD}
+      # - GF_INSTALL_PLUGINS=grafana-clock-panel
+      # - GF_SERVER_ROOT_URL=http://my.grafana.server/
+    networks:
+      - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/grafana/storage:/var/lib/grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
 
   iperf3:
     image: networkstatic/iperf3
@@ -81,111 +56,65 @@ services:
     ports:
       - 5201:5201
     command: '--server'
-    restart: "no"
+    restart: unless-stopped
 
-  photoprism:
-    image: photoprism/photoprism:latest
-    container_name: photoprism
-    hostname: photoprism
-    stop_grace_period: 10s
-    depends_on:
-      - photoprism_mariadb
-    security_opt:
-      - seccomp:unconfined
-      - apparmor:unconfined
+  ofelia:
+    image: mcuadros/ofelia:latest
+    container_name: ofelia
+    hostname: ofelia
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${CONFIG_BASE_DIR}/ofelia/jobs.ini:/etc/ofelia/config.ini
+    restart: unless-stopped
+
+  paperless-ngx:
+    image: lscr.io/linuxserver/paperless-ngx:latest
+    container_name: paperless-ngx
+    hostname: paperless-ngx
     environment:
       - PGID=${PGID}
-      - PHOTOPRISM_ADMIN_PASSWORD=${PHOTOPRISM_PASSWORD}
-      - PHOTOPRISM_ADMIN_USER=${PHOTOPRISM_USERNAME}
-      - PHOTOPRISM_AUTH_MODE=password
-      - PHOTOPRISM_DATABASE_DRIVER=mysql
-      - PHOTOPRISM_DATABASE_NAME=${PHOTOPRISM_DATABASE_NAME}
-      - PHOTOPRISM_DATABASE_PASSWORD=${PHOTOPRISM_DATABASE_PASSWORD}
-      - PHOTOPRISM_DATABASE_SERVER=photoprism_mariadb:3306
-      - PHOTOPRISM_DATABASE_USER=${PHOTOPRISM_DATABASE_USER}
-      - PHOTOPRISM_DEFAULT_TLS=true
-      - PHOTOPRISM_DETECT_NSFW=false
-      - PHOTOPRISM_DISABLE_CHOWN=false
-      - PHOTOPRISM_DISABLE_CLASSIFICATION=false
-      - PHOTOPRISM_DISABLE_FACES=false
-      - PHOTOPRISM_DISABLE_RAW=false
-      - PHOTOPRISM_DISABLE_SETTINGS=false
-      - PHOTOPRISM_DISABLE_TENSORFLOW=false
-      - PHOTOPRISM_DISABLE_TLS=false
-      - PHOTOPRISM_DISABLE_VECTORS=false
-      - PHOTOPRISM_DISABLE_WEBDAV=false
-      - PHOTOPRISM_EXPERIMENTAL=false
-      - PHOTOPRISM_FFMPEG_BITRATE=64
-      - PHOTOPRISM_FFMPEG_ENCODER=software
-      - PHOTOPRISM_FFMPEG_SIZE=3840
-      - PHOTOPRISM_GID=${PGID}
-      - PHOTOPRISM_HTTP_COMPRESSION=gzip
-      - PHOTOPRISM_INIT="https gpu tensorflow"
-      - PHOTOPRISM_JPEG_QUALITY=100
-      - PHOTOPRISM_LOG_LEVEL=info
-      - PHOTOPRISM_ORIGINALS_LIMIT=1000000
-      - PHOTOPRISM_RAW_PRESETS=false
-      - PHOTOPRISM_READONLY=false
-      - PHOTOPRISM_SITE_AUTHOR="John Wyles"
-      - PHOTOPRISM_SITE_CAPTION="A walk down memory lane..."
-      - PHOTOPRISM_SITE_DESCRIPTION="A walk down memory lane..."
-      - PHOTOPRISM_SITE_TITLE="PhotoPrism"
-      - PHOTOPRISM_SITE_URL=http://localhost:2342/
-      - PHOTOPRISM_UID=${PUID}
-      - PHOTOPRISM_UMASK=${UMASK}
-      - PHOTOPRISM_UPLOAD_NSFW=true
       - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+      - REDIS_URL=
+    networks:
+      - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/paperless-ngx:/config
+      - ${DOCUMENTS_DIR_LOCAL}/paperless-ngx:/data
+    ports:
+      - 8001:8000
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    hostname: prometheus
+    # TODO: This is such a stupid hack
+    user: root
+    environment:
       - TZ=${TZ}
       - UMASK=${UMASK}
     networks:
       - media
-    working_dir: "/photoprism"
     volumes:
-      - ${PHOTOS_DIR_LOCAL}:/photoprism/originals
-      - ${CONFIG_BASE_DIR}/photoprism/storage:/photoprism/storage
+      - ${CONFIG_BASE_DIR}/prometheus/config:/etc/prometheus
+      - ${CONFIG_BASE_DIR}/prometheus/data:/prometheus
     ports:
-      - 2342:2342
+      - 9090:9090
+    command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yaml
     restart: unless-stopped
-
-  photoprism_mariadb:
-    image: mariadb:11
-    container_name: photoprism_mariadb
-    hostname: photoprism_mariadb
-    stop_grace_period: 5s
-    security_opt:
-      - seccomp:unconfined
-      - apparmor:unconfined
-    environment:
-      MARIADB_AUTO_UPGRADE: 1
-      MARIADB_INITDB_SKIP_TZINFO: 1
-      MARIADB_DATABASE: ${PHOTOPRISM_DATABASE_NAME}
-      MARIADB_USER: ${PHOTOPRISM_DATABASE_USER}
-      MARIADB_PASSWORD: ${PHOTOPRISM_DATABASE_PASSWORD}
-      MARIADB_ROOT_PASSWORD: ${PHOTOPRISM_DATABASE_ROOT_PASSWORD}
-    volumes:
-      - ${CONFIG_BASE_DIR}/photoprism/database:/var/lib/mysql
-    command: --innodb-buffer-pool-size=512M --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=60
-    restart: unless-stopped
-
-  # TODO: Uncomment this when you know what it does
-  #
-  # photoprism_ofelia:
-  #   image: mcuadros/ofelia:latest
-  #   container_name: photoprism_ofelia
-  #   hostname: photoprism_ofelia
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #     - ./jobs.ini:/etc/ofelia/config.ini
-  #   restart: unless-stopped
 
   searxng:
     image: searxng/searxng:latest
     container_name: searxng
     hostname: searxng
     environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
       - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
-    networks:
-      - media
+      - TZ=${TZ}
+      - UMASK=${UMASK}
     cap_drop:
       - ALL
     cap_add:
@@ -197,10 +126,13 @@ services:
       options:
         max-size: 1m
         max-file: 1
+    networks:
+      - media
     volumes:
       - ${CONFIG_BASE_DIR}/searxng:/etc/searxng:rw
     ports:
       - 8082:8080
+    restart: unless-stopped
 
   syncthing:
     image: lscr.io/linuxserver/syncthing:latest
@@ -253,6 +185,62 @@ services:
       - ${CONFIG_BASE_DIR}/tailscale/tmp:/tmp
     restart: unless-stopped
 
+  wallabag:
+    image: wallabag/wallabag
+    container_name: wallabag
+    hostname: wallabag
+    depends_on:
+      - wallabag_db
+      - wallabag_redis
+    environment:
+      - MYSQL_ROOT_PASSWORD=${WALLABAG_DATABASE_ROOT_PASSWORD}
+      - SYMFONY__ENV__DATABASE_DRIVER=pdo_mysql
+      - SYMFONY__ENV__DATABASE_HOST=wallabag-db
+      - SYMFONY__ENV__DATABASE_PORT=3306
+      - SYMFONY__ENV__DATABASE_NAME=${WALLABAG_DATABASE_NAME}
+      - SYMFONY__ENV__DATABASE_USER=${WALLABAG_DATABASE_USER}
+      - SYMFONY__ENV__DATABASE_PASSWORD=${WALLABAG_DATABASE_PASSWORD}
+      - SYMFONY__ENV__DATABASE_CHARSET=utf8mb4
+      - SYMFONY__ENV__DATABASE_TABLE_PREFIX="wallabag_"
+      - SYMFONY__ENV__MAILER_DSN=smtp://127.0.0.1
+      - SYMFONY__ENV__FROM_EMAIL=${WALLABAG_FROM_EMAIL}
+      - SYMFONY__ENV__DOMAIN_NAME=${WALLABAG_DOMAIN_NAME}
+      - SYMFONY__ENV__SERVER_NAME=${WALLABAG_SERVER_NAME:-wallabag}
+    networks:
+      - media
+    ports:
+      - 8092:80
+    volumes:
+      - ${CONFIG_BASE_DIR}/wallabag/images:/var/www/wallabag/web/assets/images
+    healthcheck:
+      test: ["CMD", "wget" ,"--no-verbose", "--tries=1", "--spider", "http://localhost"]
+      interval: 1m
+      timeout: 3s
+
+  wallabag_db:
+    image: mariadb
+    container_name: wallabag_db
+    hostname: wallabag-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${WALLABAG_DATABASE_ROOT_PASSWORD}
+    networks:
+      - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/wallabag/database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 20s
+      timeout: 3s
+
+  wallabag_redis:
+    image: redis:alpine
+    container_name: wallabag_redis
+    hostname: wallabag-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 20s
+      timeout: 3s
+
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
@@ -275,13 +263,13 @@ services:
     networks:
       - media
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
 
 networks:
   media:
     name: media
-    # external: true
+    external: true
     driver: bridge
     driver_opts:
       com.docker.network.bridge.enable_icc: "true"

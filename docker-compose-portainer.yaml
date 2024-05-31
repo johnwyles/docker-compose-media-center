@@ -1,4 +1,8 @@
-version: "3.7"
+# ||--------------------------------------------------------------------------------||
+# ||                                  Portainer                                     ||
+# ||--------------------------------------------------------------------------------||
+
+version: "3.9"
 
 services:
   portainer:
@@ -10,6 +14,8 @@ services:
       - PUID=${PUID}
       - TZ=${TZ}
       - UMASK=${UMASK}
+    labels:
+      - io.portainer.accesscontrol.public
     networks:
       - media
     volumes:
@@ -18,13 +24,14 @@ services:
     ports:
       - 8000:8000
       - 9000:9000
-    command: -H unix:///var/run/docker.sock
+      - 9443:9443
+    command: -H unix:///var/run/docker.sock --admin-password ${PORTAINER_PASSWORD}
     restart: always
 
 networks:
   media:
     name: media
-    # external: true
+    external: true
     driver: bridge
     driver_opts:
       com.docker.network.bridge.enable_icc: "true"

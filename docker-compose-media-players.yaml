@@ -1,9 +1,27 @@
 # ||--------------------------------------------------------------------------------||
 # ||                                Plex Applications                               ||
 # ||--------------------------------------------------------------------------------||
-version: "3.7"
+version: "3.9"
 
 services:
+  emby:
+    image: lscr.io/linuxserver/emby:latest
+    container_name: emby
+    hostname: emby
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    volumes:
+      - ${CONFIG_BASE_DIR}/emby:/config
+      - ${MOVIES_DIR_LOCAL}:${MOVIES_DIR_RELATIVE}
+      - ${TV_DIR_LOCAL}:${TV_DIR_RELATIVE}
+    ports:
+      - 8097:8096
+      - 8921:8920
+    restart: unless-stopped
+
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin

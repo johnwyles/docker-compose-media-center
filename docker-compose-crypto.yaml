@@ -2,7 +2,7 @@
 # ||                              Crypto Applications                               ||
 # ||--------------------------------------------------------------------------------||
 
-version: "3.7"
+version: "3.9"
 
 services:
   rana:
@@ -38,6 +38,7 @@ services:
 networks:
   media:
     name: media
+    external: true
     driver: bridge
     driver_opts:
       com.docker.network.bridge.enable_icc: "true"
