@@ -37,25 +37,25 @@ services:
       - 51413:51413/udp # transmission/transmission-openvpn
     restart: unless-stopped
 
-  deluge:
-    image: lscr.io/linuxserver/deluge:latest
-    container_name: deluge
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - DELUGE_LOGLEVEL=info
-      - UMASK=${UMASK}
-    network_mode: "service:gluetun"
-    depends_on:
-      - gluetun
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
-      - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
-      - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
-      - ${CONFIG_BASE_DIR}/deluge:/config
-    restart: unless-stopped
+  # deluge:
+  #   image: lscr.io/linuxserver/deluge:latest
+  #   container_name: deluge
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #     - DELUGE_LOGLEVEL=info
+  #     - UMASK=${UMASK}
+  #   network_mode: "service:gluetun"
+  #   depends_on:
+  #     - gluetun
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
+  #     - ${CONFIG_BASE_DIR}/deluge:/config
+  #   restart: unless-stopped
 
   # delugevpn:
   #   container_name: delugevpn
@@ -265,47 +265,47 @@ services:
   #     - ${CONFIG_BASE_DIR}/sabnzbdvpn:/config
   #   restart: unless-stopped
 
-  transmission:
-    image: lscr.io/linuxserver/transmission:latest
-    container_name: transmission
-    environment:
-      - DEBUG=${DEBUG}
-      - ENABLE_UFW=true
-      - GLOBAL_APPLY_PERMISSIONS=false
-      - HOST_WHITELIST=
-      - LOCAL_NETWORK=
-      - PASS=${TRANSMISSION_PASS}
-      - PEER_DNS_PIN_ROUTES=false
-      - PEER_DNS=false
-      - PEERPORT=
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - TRANSMISSION_DOWNLOAD_DIR=${DOWNLOADS_DIR_COMPLETE_RELATIVE}
-      - TRANSMISSION_INCOMPLETE_DIR=${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
+  # transmission:
+  #   image: lscr.io/linuxserver/transmission:latest
+  #   container_name: transmission
+  #   environment:
+  #     - DEBUG=${DEBUG}
+  #     - ENABLE_UFW=true
+  #     - GLOBAL_APPLY_PERMISSIONS=false
+  #     - HOST_WHITELIST=
+  #     - LOCAL_NETWORK=
+  #     - PASS=${TRANSMISSION_PASS}
+  #     - PEER_DNS_PIN_ROUTES=false
+  #     - PEER_DNS=false
+  #     - PEERPORT=
+  #     - PGID=${PGID}
+  #     - PUID=${PUID}
+  #     - TRANSMISSION_DOWNLOAD_DIR=${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+  #     - TRANSMISSION_INCOMPLETE_DIR=${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
 
-      # (optional) Download the ZIP file below and extract the contents to
-      # "flood-for-transmission" in the "[CONFIG_BASE_DIR]/transmission" location: 
-      #     https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.zip    
-      - TRANSMISSION_WEB_HOME=/config/flood-for-transmission
-      - TRANSMISSION_WEB_UI=flood-for-transmission
+  #     # (optional) Download the ZIP file below and extract the contents to
+  #     # "flood-for-transmission" in the "[CONFIG_BASE_DIR]/transmission" location: 
+  #     #     https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.zip    
+  #     - TRANSMISSION_WEB_HOME=/config/flood-for-transmission
+  #     - TRANSMISSION_WEB_UI=flood-for-transmission
 
-      - TZ=${TZ}
-      - UFW_ALLOW_GW_NET=true
-      - UFW_DISABLE_IPTABLES_REJECT=true
-      - UFW_EXTRA_PORTS=6789,6881,8080,8112,9091,9910
-      - UMASK=${UMASK}
-      - USER=${TRANSMISSION_USER}
-      - WHITELIST=
-    network_mode: "service:gluetun"
-    depends_on:
-      - gluetun
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
-      - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
-      - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
-      - ${CONFIG_BASE_DIR}/transmission:/config
-    restart: unless-stopped
+  #     - TZ=${TZ}
+  #     - UFW_ALLOW_GW_NET=true
+  #     - UFW_DISABLE_IPTABLES_REJECT=true
+  #     - UFW_EXTRA_PORTS=6789,6881,8080,8112,9091,9910
+  #     - UMASK=${UMASK}
+  #     - USER=${TRANSMISSION_USER}
+  #     - WHITELIST=
+  #   network_mode: "service:gluetun"
+  #   depends_on:
+  #     - gluetun
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
+  #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
+  #     - ${CONFIG_BASE_DIR}/transmission:/config
+  #   restart: unless-stopped
 
   # transmission-openvpn:
   #   image: haugene/transmission-openvpn

@@ -4,82 +4,82 @@
 version: "3.9"
 
 services:
-  emby:
-    image: lscr.io/linuxserver/emby:latest
-    container_name: emby
-    hostname: emby
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    volumes:
-      - ${CONFIG_BASE_DIR}/emby:/config
-      - ${MOVIES_DIR_LOCAL}:${MOVIES_DIR_RELATIVE}
-      - ${TV_DIR_LOCAL}:${TV_DIR_RELATIVE}
-    ports:
-      - 8097:8096
-      - 8921:8920
-    restart: unless-stopped
+  # emby:
+  #   image: lscr.io/linuxserver/emby:latest
+  #   container_name: emby
+  #   hostname: emby
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   volumes:
+  #     - ${CONFIG_BASE_DIR}/emby:/config
+  #     - ${MOVIES_DIR_LOCAL}:${MOVIES_DIR_RELATIVE}
+  #     - ${TV_DIR_LOCAL}:${TV_DIR_RELATIVE}
+  #   ports:
+  #     - 8097:8096
+  #     - 8921:8920
+  #   restart: unless-stopped
 
-  jellyfin:
-    image: lscr.io/linuxserver/jellyfin:latest
-    container_name: jellyfin
-    hostname: jellyfin
-    environment:
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    networks:
-      - media
-    volumes:
-      - ${BOOKS_DIR_LOCAL}:${BOOKS_DIR_RELATIVE}
-      - ${CONFIG_BASE_DIR}/jellyfin:/config
-      - ${MOVIES_DIR_LOCAL}:${MOVIES_DIR_RELATIVE}
-      - ${MUSIC_DIR_LOCAL}:${MUSIC_DIR_RELATIVE}
-      - ${TV_DIR_LOCAL}:${TV_DIR_RELATIVE}
-    ports:
-      # - 1900:1900/udp
-      - 7359:7359/udp
-      - 8096:8096
-      - 8920:8920
-    restart: unless-stopped
+  # jellyfin:
+  #   image: lscr.io/linuxserver/jellyfin:latest
+  #   container_name: jellyfin
+  #   hostname: jellyfin
+  #   environment:
+  #     - PGID=${PGID}
+  #     - PUID=${PUID}
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - ${BOOKS_DIR_LOCAL}:${BOOKS_DIR_RELATIVE}
+  #     - ${CONFIG_BASE_DIR}/jellyfin:/config
+  #     - ${MOVIES_DIR_LOCAL}:${MOVIES_DIR_RELATIVE}
+  #     - ${MUSIC_DIR_LOCAL}:${MUSIC_DIR_RELATIVE}
+  #     - ${TV_DIR_LOCAL}:${TV_DIR_RELATIVE}
+  #   ports:
+  #     # - 1900:1900/udp
+  #     - 7359:7359/udp
+  #     - 8096:8096
+  #     - 8920:8920
+  #   restart: unless-stopped
 
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
-    hostname: jellyseerr
-    environment:
-      - LOG_LEVEL=debug
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    networks:
-      - media
-    volumes:
-      - ${CONFIG_BASE_DIR}/jellyseerr:/app/config
-    ports:
-      - 5056:5055
-    restart: unless-stopped
+  # jellyseerr:
+  #   image: fallenbagel/jellyseerr:latest
+  #   container_name: jellyseerr
+  #   hostname: jellyseerr
+  #   environment:
+  #     - LOG_LEVEL=debug
+  #     - PGID=${PGID}
+  #     - PUID=${PUID}
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - ${CONFIG_BASE_DIR}/jellyseerr:/app/config
+  #   ports:
+  #     - 5056:5055
+  #   restart: unless-stopped
 
-  overseerr:
-    image: lscr.io/linuxserver/overseerr:latest
-    container_name: overseerr
-    hostname: overseerr
-    environment:
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    networks:
-      - media
-    volumes:
-      - ${CONFIG_BASE_DIR}/overseerr:/config
-    ports:
-      - 5055:5055
-    restart: unless-stopped
+  # overseerr:
+  #   image: lscr.io/linuxserver/overseerr:latest
+  #   container_name: overseerr
+  #   hostname: overseerr
+  #   environment:
+  #     - PGID=${PGID}
+  #     - PUID=${PUID}
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - ${CONFIG_BASE_DIR}/overseerr:/config
+  #   ports:
+  #     - 5055:5055
+  #   restart: unless-stopped
 
   plex:
     image: lscr.io/linuxserver/plex:latest
@@ -112,22 +112,22 @@ services:
       - 32469:32469
     restart: unless-stopped
 
-  tautulli:
-    image: lscr.io/linuxserver/tautulli:latest
-    container_name: tautulli
-    hostname: tautulli
-    environment:
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    networks:
-      - media
-    volumes:
-      - ${CONFIG_BASE_DIR}/tautulli:/config
-    ports:
-      - 8181:8181
-    restart: unless-stopped
+  # tautulli:
+  #   image: lscr.io/linuxserver/tautulli:latest
+  #   container_name: tautulli
+  #   hostname: tautulli
+  #   environment:
+  #     - PGID=${PGID}
+  #     - PUID=${PUID}
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - ${CONFIG_BASE_DIR}/tautulli:/config
+  #   ports:
+  #     - 8181:8181
+  #   restart: unless-stopped
 
 networks:
   media:

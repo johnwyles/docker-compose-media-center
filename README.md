@@ -9,8 +9,9 @@ NAS or media center
   - [Useful Resources To Have On-hand](#useful-resources-to-have-on-hand)
   - [Docker Compose Files and the Applications and Services Within](#docker-compose-files-and-the-applications-and-services-within)
     - [`portainer/docker-compose-portainer.yaml`](#portainerdocker-compose-portaineryaml)
+    - [`docker-compose-crypto.yaml` \[OPTIONAL\]](#docker-compose-cryptoyaml-optional)
+    - [`docker-compose-ops.yaml`](#docker-compose-opsyaml)
     - [`docker-compose-tools.yaml`](#docker-compose-toolsyaml)
-    - [`docker-compose-crypto.yaml`](#docker-compose-cryptoyaml)
     - [`docker-compose-downloaders.yaml`](#docker-compose-downloadersyaml)
     - [`docker-compose-servarr.yaml`](#docker-compose-servarryaml)
     - [`docker-compose-photos.yaml`](#docker-compose-photosyaml)
@@ -59,28 +60,7 @@ associated Docker image sources, GitHub repositories, or
 - [Portainer](https://hub.docker.com/r/portainer/portainer) Portainer for
   managing the remaining "Stacks" (docker-compose files).
 
-### `docker-compose-tools.yaml`
-- [Grafana](https://github.com/grafana/grafana): A tool for visualizing metrics.
-- [iperf]([iperf3](https://github.com/esnet/iperf)): A utility used to test
-  speeds between two machines. Both a client and server tool in one. In this
-  case we will run the container in server mode.
-- [Ofelia](https://github.com/mcuadros/ofelia): A tool for scheduling cron jobs
-  in Docker containers.
-- [Paperless-NGX](https://github.com/paperless-ngx/paperless-ngx): A tool for 
-  organizing documents and files.
-- [Prometheus](https://github.com/prometheus/prometheus): A tool for monitoring
-  metrics and statistics.
-- [SearXNG](https://github.com/searxng/searxng-docker): Utility for an internet
-  metasearch engine that aggregates search results.
-- [Syncthing](https://github.com/linuxserver/docker-syncthing): Utility for
-  syncing files across machines.
-- [Tailscale](https://hub.docker.com/r/tailscale/tailscale): Private VPN to
-  chain together your home network and other networks and machines for sharing
-  services and files.
-- [Watchtower](https://github.com/containrrr/watchtower): Watchtower for watching
-  updates to docker images and pulling them down.
-
-### `docker-compose-crypto.yaml`
+### `docker-compose-crypto.yaml` [OPTIONAL]
 
 **NOTE:** I do not set this up in later steps below as I highly doubut you will want
 to peg your CPU and run this utility alongside what this guide was meant to assit
@@ -93,6 +73,34 @@ contact me if you would like more information.
   did of [vanity-age](https://github.com/sobaq/vanity-age) for finding _vanity_
   public `age` keys.
 
+### `docker-compose-ops.yaml`
+- [cAdvisor](https://github.com/google/cadvisor): A tool for monitoring Docker
+  containers, images, system resources, etc.
+- [Grafana](https://github.com/grafana/grafana): A tool for visualizing metrics.
+- [iperf]([iperf3](https://github.com/esnet/iperf)): A utility used to test
+  speeds between two machines. Both a client and server tool in one. In this
+  case we will run the container in server mode.
+- [Ofelia](https://github.com/mcuadros/ofelia): A tool for scheduling cron jobs
+  in Docker containers.
+- [Prometheus](https://github.com/prometheus/prometheus): A tool for monitoring
+  metrics and statistics.
+- [Prometheus SNMP Exporter](): An important utility for collection device
+  statistics for the Synolog NAS
+- [Redis](https://github.com/redis/redis): A tool for caching and storing data.
+- [Watchtower](https://github.com/containrrr/watchtower): Watchtower for watching
+  updates to docker images and pulling them down.
+
+### `docker-compose-tools.yaml`
+- [Paperless-NGX](https://github.com/paperless-ngx/paperless-ngx): A tool for 
+  organizing documents and files.
+- [SearXNG](https://github.com/searxng/searxng-docker): Utility for an internet
+  metasearch engine that aggregates search results.
+- [Syncthing](https://github.com/linuxserver/docker-syncthing): Utility for
+  syncing files across machines.
+- [Tailscale](https://hub.docker.com/r/tailscale/tailscale): Private VPN to
+  chain together your home network and other networks and machines for sharing
+  services and files.
+
 ### `docker-compose-downloaders.yaml`
 
 **NOTE:**: For posterity's sake I left in SABnzbdVPN and Transmission-OpenVPN
@@ -101,20 +109,22 @@ found using [glueun](`https://github.com/qdm12/gluetun`) mentioned above to be a
 better utility to operate as a VPN killswitch universally I could plug any
 container I wanted to up to it.
 
-- [Deluge](https://github.com/linuxserver/docker-deluge): Deluge for torrent
-  downloads.
-- [Exportarr](https://github.com/onedr0p/exportarr): Exportarr for metrics.
+- ~~[Deluge](https://github.com/linuxserver/docker-deluge): Deluge for torrent
+  downloads.~~
+- [Exportarr](https://github.com/onedr0p/exportarr): Exportarr for metrics (qBittorrent).
 - [Gluetun](https://github.com/qdm12/gluetun): Utility for a base VPN killswitch
   container that the downloading containers filter through when downloading.
-- [NZBGet](https://github.com/linuxserver/docker-nzbget): NZBGet for Usenet
-  downloads.
+- ~~[NZBGet](https://github.com/linuxserver/docker-nzbget): NZBGet for Usenet
+  downloads.~~
+- [qBitorrent](https://docs.linuxserver.io/images/docker-qbittorrent/): A
+  sophisticated and battle tested bittorrent client.
 - [SABnzbd](https://github.com/linuxserver/docker-sabnzbd) SABnzbd for Usenet
   downloads.
 - ~~[SABnnzdVPN](https://github.com/binhex/arch-sabnzbdvpn) SABnzbd with OpenVPN
   for torrent downloads which includes a VPN killswitch to stop downloading on
   loss of a VPN connection.~~
-- [Tranismission](https://github.com/linuxserver/docker-transmission)
-  Transmission for torrent downloads.
+- ~~[Tranismission](https://github.com/linuxserver/docker-transmission)
+  Transmission for torrent downloads.~~
 - ~~[Transmission-OpenVPN](https://github.com/haugene/docker-transmission-openvpn):
   Transmission with OpenVPN for torrent downloads which includes a VPN killswitch
   to stop downloading on loss of a VPN connection.~~
@@ -128,6 +138,8 @@ container I wanted to up to it.
 - [Exportarr](https://github.com/onedr0p/exportarr): Exportarr for metrics.
 - [Mylar3](https://github.com/mylar3/mylar3): Mylar3 for Comic Books.
 - [Lidarr](https://github.com/linuxserver/docker-lidarr): Lidarr for Music.
+- [Notifiarr](https://hub.docker.com/r/golift/notifiarr): Notifiarr for Discord
+  and Webhooks.
 - [Prowlarr](https://github.com/linuxserver/docker-prowlarr): Prowlarr for
   adding Indexers to Stararr services.
 - [Radarr](https://github.com/linuxserver/docker-radarr): Radarr for Movies.
@@ -147,18 +159,16 @@ container I wanted to up to it.
 
 ### `docker-compose-media-players.yaml`
 
-- [Jellyfin](https://github.com/linuxserver/docker-jellyfin): Jellyfin media
-  center for viewing and playing all of your media.
-- [Jellyseerr](https://hub.docker.com/r/fallenbagel/jellyseerr): Jellyseerr
-  (Overseerr fork) for browsing and discovering of new media.
-- [Notifiarr](https://hub.docker.com/r/golift/notifiarr): Notifiarr for Discord
-  and Webhooks.
+- ~~[Jellyfin](https://github.com/linuxserver/docker-jellyfin): Jellyfin media
+  center for viewing and playing all of your media.~~
+- ~~[Jellyseerr](https://hub.docker.com/r/fallenbagel/jellyseerr): Jellyseerr
+  (Overseerr fork) for browsing and discovering of new media.~~
 - [Plex](https://github.com/linuxserver/docker-plex): Plex media center for
   viewing and playing all of your media.
-- [Tautulli](https://github.com/linuxserver/docker-tautulli): Tautulli for Plex
-  statistics and monitoring.
-- [Overseerr](https://github.com/linuxserver/docker-overseerr): Overseer for
-  browsing and discovering of new media.
+- ~~[Tautulli](https://github.com/linuxserver/docker-tautulli): Tautulli for Plex
+  statistics and monitoring.~~
+- ~~[Overseerr](https://github.com/linuxserver/docker-overseerr): Overseer for
+  browsing and discovering of new media.~~
 
 ### `docker-compose-kometa.yaml`
 
@@ -220,11 +230,13 @@ values Docker compose needs then everything should proceed smoothly:
       - `cd portainer/`
       - `docker compose --file docker-compose-portainer.yaml --env-file ../.env up --detach`
     - And now for the rest:
+      - `cd ../`
+      - `docker compose --file docker-compose-ops.yaml --env-file .env up --detach`
       - `docker compose --file docker-compose-tools.yaml --env-file .env up --detach`
       - `docker compose --file docker-compose-downloaders.yaml --env-file .env up --detach`
-      - `docker compose --file docker-compose-servarr.yaml --env-file .env up --detach`
       - `docker compose --file docker-compose-media-players.yaml --env-file .env up --detach`
       - `docker compose --file docker-compose-photos.yaml --env-file .env up --detach`
+      - `docker compose --file docker-compose-servarr.yaml --env-file .env up --detach`
     - Also if you'd like to setup Kometa you'll want to add a cron entry you
       run periodically (around every 24-96 hours) with the following command or
       the alternative listed afterwards:
@@ -274,6 +286,7 @@ mkdir -p ${CONFIG_BASE_DIR}/deluge
 # mkdir -p ${CONFIG_BASE_DIR}/delugevpn
 mkdir -p ${CONFIG_BASE_DIR}/gluetun
 mkdir -p ${CONFIG_BASE_DIR}/grafana/database
+mkdir -p ${CONFIG_BASE_DIR}/grafana/snmp
 mkdir -p ${CONFIG_BASE_DIR}/grafana/storage
 mkdir -p ${CONFIG_BASE_DIR}/immich/cache
 mkdir -p ${CONFIG_BASE_DIR}/immich/database
@@ -529,6 +542,11 @@ _relative_ to the container (i.e. **not** the actual location of the files on
 - `VPN_SERVICE_PROVIDER`: Gluetun VPN service provider (e.g.
   `private internet access` for Private Internet Access VPN, `nordvpn` for
   NordVPN, etc.)
+- `WATCHTOWER_HTTP_API_TOKEN`: A passphrase to use when pulling metrics for a
+  tool like Promethus
+- `WATCHTOWER_NOTIFICATION_URL`: A webhook URL to hit for Watchtower
+  notifications
+- `WATCHTOWER_POLL_INTERVAL`: Poll interval for Watchtower to check for images
 - `VPN_USER`: VPN username for your VPN provider
 - `WALLABAG_DATABASE_NAME`: The name for the Wallabag database
 - `WALLABAG_DATABASE_PASSWORD`: The password for the Wallabag database

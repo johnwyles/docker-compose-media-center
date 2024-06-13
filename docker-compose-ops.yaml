@@ -1,0 +1,175 @@
+# ||--------------------------------------------------------------------------------||
+# ||                                Operational Tools                               ||
+# ||--------------------------------------------------------------------------------||
+
+version: "3.9"
+
+services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+    - 8585:8080
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+    - redis
+
+  grafana:
+    image: grafana/grafana-enterprise:latest
+    container_name: grafana
+    hostname: grafana
+    user: root
+    depends_on:
+      - grafana_postgres
+    environment:
+      - GF_DATABASE_TYPE=postgres
+      - GF_DATABASE_HOST=grafana_postgres
+      - GF_DATABASE_NAME=${GRAFANA_DATABASE_NAME}
+      - GF_DATABASE_USER=${GRAFANA_DATABASE_USER}
+      - GF_DATABASE_PASSWORD=${GRAFANA_DATABASE_PASSWORD}
+      # - GF_INSTALL_PLUGINS=grafana-clock-panel
+      # - GF_SERVER_ROOT_URL=http://my.grafana.server/
+    networks:
+      - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/grafana/storage:/var/lib/grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+
+  grafana_postgres:
+    image: postgres:16-alpine
+    container_name: grafana_postgres
+    hostname: grafana-postgres
+    environment:
+      - POSTGRES_DB=${GRAFANA_DATABASE_NAME}
+      - POSTGRES_USER=${GRAFANA_DATABASE_USER}
+      - POSTGRES_PASSWORD=${GRAFANA_DATABASE_PASSWORD}
+    networks:
+      - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/grafana/database:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  iperf3:
+    image: networkstatic/iperf3
+    container_name: iperf3
+    hostname: iperf3
+    environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    ports:
+      - 5201:5201
+    command: '--server'
+    restart: unless-stopped
+
+  ofelia:
+    image: mcuadros/ofelia:latest
+    container_name: ofelia
+    hostname: ofelia
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${CONFIG_BASE_DIR}/ofelia/jobs.ini:/etc/ofelia/config.ini
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    hostname: prometheus
+    # TODO: This is such a stupid hack
+    user: root
+    depends_on:
+    - cadvisor
+    environment:
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/prometheus/config:/etc/prometheus
+      - ${CONFIG_BASE_DIR}/prometheus/data:/prometheus
+    ports:
+      - 9090:9090
+    command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yaml
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    hostname: redis
+    ports:
+    - 6379:6379
+
+  snmp-exporter:
+    image: prom/snmp-exporter:latest
+    container_name: snmp_exporter
+    hostname: snmp-exporter
+    user: 1024:100
+    networks:
+      - media
+    cpu_shares: 512
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:9116/ || exit 1
+    mem_limit: 256m
+    mem_reservation: 64m
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ${CONFIG_BASE_DIR}/grafana/snmp:/etc/snmp_exporter/:ro
+    command:
+      - '--config.file=/etc/snmp_exporter/snmp.yaml'
+    restart: on-failure:5
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    hostname: watchtower
+    environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_HTTP_API_TOKEN={$WATCHTOWER_HTTP_API_TOKEN}
+      - WATCHTOWER_INCLUDE_RESTARTING=true
+      - WATCHTOWER_INCLUDE_STOPPED=true
+      - WATCHTOWER_LABEL_ENABLE=false
+      - WATCHTOWER_NOTIFICATION_REPORT=true
+      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_NOTIFICATION_URL}
+      - WATCHTOWER_POLL_INTERVAL=${WATCHTOWER_POLL_INTERVAL}
+      - WATCHTOWER_REMOVE_VOLUMES=true
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - media
+    ports:
+      - 8484:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+
+networks:
+  media:
+    name: media
+    external: true
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.bridge.host_binding_ipv4: "0.0.0.0"
+      com.docker.network.bridge.name: "media"
+      com.docker.network.driver.mtu: "1500"
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY_IP}
+          ip_range: ${IP_RANGE}

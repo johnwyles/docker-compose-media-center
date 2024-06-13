@@ -1,0 +1,40 @@
+# ||--------------------------------------------------------------------------------||
+# ||                                     Kometa                                     ||
+# ||--------------------------------------------------------------------------------||
+version: "3.9"
+
+services:
+  kometa:
+    image: kometateam/kometa:latest
+    container_name: kometa
+    hostname: kometa
+    environment:
+      - PGID=${PGID}
+      - KOMETA_PLEX_TOKEN=${KOMETA_PLEX_TOKEN}
+      - KOMETA_PLEX_URL=${KOMETA_PLEX_URL}
+      - KOMETA_RUN=True
+      - KOMETA_TIME=
+      - PUID=${PUID}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/kometa:/config
+    restart: "no"
+
+networks:
+  media:
+    name: media
+    external: true
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.bridge.host_binding_ipv4: "0.0.0.0"
+      com.docker.network.bridge.name: "media"
+      com.docker.network.driver.mtu: "1500"
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY_IP}
+          ip_range: ${IP_RANGE}

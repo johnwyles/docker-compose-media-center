@@ -5,68 +5,6 @@
 version: "3.9"
 
 services:
-  grafana_postgres:
-    image: postgres:16-alpine
-    container_name: grafana_postgres
-    hostname: grafana-postgres
-    environment:
-      - POSTGRES_DB=${GRAFANA_DATABASE_NAME}
-      - POSTGRES_USER=${GRAFANA_DATABASE_USER}
-      - POSTGRES_PASSWORD=${GRAFANA_DATABASE_PASSWORD}
-    networks:
-      - media
-    volumes:
-      - ${CONFIG_BASE_DIR}/grafana/database:/var/lib/postgresql/data
-    restart: unless-stopped
-
-  grafana:
-    image: grafana/grafana-enterprise:latest
-    container_name: grafana
-    hostname: grafana
-    user: root
-    depends_on:
-      - grafana_postgres
-    environment:
-      - GF_DATABASE_TYPE=postgres
-      - GF_DATABASE_HOST=grafana_postgres
-      - GF_DATABASE_NAME=${GRAFANA_DATABASE_NAME}
-      - GF_DATABASE_USER=${GRAFANA_DATABASE_USER}
-      - GF_DATABASE_PASSWORD=${GRAFANA_DATABASE_PASSWORD}
-      # - GF_INSTALL_PLUGINS=grafana-clock-panel
-      # - GF_SERVER_ROOT_URL=http://my.grafana.server/
-    networks:
-      - media
-    volumes:
-      - ${CONFIG_BASE_DIR}/grafana/storage:/var/lib/grafana
-    ports:
-      - 3000:3000
-    restart: unless-stopped
-
-  iperf3:
-    image: networkstatic/iperf3
-    container_name: iperf3
-    hostname: iperf3
-    environment:
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    networks:
-      - media
-    ports:
-      - 5201:5201
-    command: '--server'
-    restart: unless-stopped
-
-  ofelia:
-    image: mcuadros/ofelia:latest
-    container_name: ofelia
-    hostname: ofelia
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${CONFIG_BASE_DIR}/ofelia/jobs.ini:/etc/ofelia/config.ini
-    restart: unless-stopped
-
   paperless-ngx:
     image: lscr.io/linuxserver/paperless-ngx:latest
     container_name: paperless-ngx
@@ -86,53 +24,35 @@ services:
       - 8001:8000
     restart: unless-stopped
 
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    hostname: prometheus
-    # TODO: This is such a stupid hack
-    user: root
-    environment:
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    networks:
-      - media
-    volumes:
-      - ${CONFIG_BASE_DIR}/prometheus/config:/etc/prometheus
-      - ${CONFIG_BASE_DIR}/prometheus/data:/prometheus
-    ports:
-      - 9090:9090
-    command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yaml
-    restart: unless-stopped
+  # searxng:
+  #   image: searxng/searxng:latest
+  #   container_name: searxng
+  #   hostname: searxng
+  #   environment:
+  #     - PGID=${PGID}
+  #     - PUID=${PUID}
+  #     - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   cap_drop:
+  #     - ALL
+  #   cap_add:
+  #     - CHOWN
+  #     - SETGID
+  #     - SETUID
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: 1m
+  #       max-file: 1
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - ${CONFIG_BASE_DIR}/searxng:/etc/searxng:rw
+  #   ports:
+  #     - 8082:8080
+  #   restart: unless-stopped
 
-  searxng:
-    image: searxng/searxng:latest
-    container_name: searxng
-    hostname: searxng
-    environment:
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETGID
-      - SETUID
-    logging:
-      driver: json-file
-      options:
-        max-size: 1m
-        max-file: 1
-    networks:
-      - media
-    volumes:
-      - ${CONFIG_BASE_DIR}/searxng:/etc/searxng:rw
-    ports:
-      - 8082:8080
-    restart: unless-stopped
 
   syncthing:
     image: lscr.io/linuxserver/syncthing:latest
@@ -185,86 +105,61 @@ services:
       - ${CONFIG_BASE_DIR}/tailscale/tmp:/tmp
     restart: unless-stopped
 
-  wallabag:
-    image: wallabag/wallabag
-    container_name: wallabag
-    hostname: wallabag
-    depends_on:
-      - wallabag_db
-      - wallabag_redis
-    environment:
-      - MYSQL_ROOT_PASSWORD=${WALLABAG_DATABASE_ROOT_PASSWORD}
-      - SYMFONY__ENV__DATABASE_DRIVER=pdo_mysql
-      - SYMFONY__ENV__DATABASE_HOST=wallabag-db
-      - SYMFONY__ENV__DATABASE_PORT=3306
-      - SYMFONY__ENV__DATABASE_NAME=${WALLABAG_DATABASE_NAME}
-      - SYMFONY__ENV__DATABASE_USER=${WALLABAG_DATABASE_USER}
-      - SYMFONY__ENV__DATABASE_PASSWORD=${WALLABAG_DATABASE_PASSWORD}
-      - SYMFONY__ENV__DATABASE_CHARSET=utf8mb4
-      - SYMFONY__ENV__DATABASE_TABLE_PREFIX="wallabag_"
-      - SYMFONY__ENV__MAILER_DSN=smtp://127.0.0.1
-      - SYMFONY__ENV__FROM_EMAIL=${WALLABAG_FROM_EMAIL}
-      - SYMFONY__ENV__DOMAIN_NAME=${WALLABAG_DOMAIN_NAME}
-      - SYMFONY__ENV__SERVER_NAME=${WALLABAG_SERVER_NAME:-wallabag}
-    networks:
-      - media
-    ports:
-      - 8092:80
-    volumes:
-      - ${CONFIG_BASE_DIR}/wallabag/images:/var/www/wallabag/web/assets/images
-    healthcheck:
-      test: ["CMD", "wget" ,"--no-verbose", "--tries=1", "--spider", "http://localhost"]
-      interval: 1m
-      timeout: 3s
+  # wallabag:
+  #   image: wallabag/wallabag
+  #   container_name: wallabag
+  #   hostname: wallabag
+  #   depends_on:
+  #     - wallabag_db
+  #     - wallabag_redis
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=${WALLABAG_DATABASE_ROOT_PASSWORD}
+  #     - SYMFONY__ENV__DATABASE_DRIVER=pdo_mysql
+  #     - SYMFONY__ENV__DATABASE_HOST=wallabag-db
+  #     - SYMFONY__ENV__DATABASE_PORT=3306
+  #     - SYMFONY__ENV__DATABASE_NAME=${WALLABAG_DATABASE_NAME}
+  #     - SYMFONY__ENV__DATABASE_USER=${WALLABAG_DATABASE_USER}
+  #     - SYMFONY__ENV__DATABASE_PASSWORD=${WALLABAG_DATABASE_PASSWORD}
+  #     - SYMFONY__ENV__DATABASE_CHARSET=utf8mb4
+  #     - SYMFONY__ENV__DATABASE_TABLE_PREFIX="wallabag_"
+  #     - SYMFONY__ENV__MAILER_DSN=smtp://127.0.0.1
+  #     - SYMFONY__ENV__FROM_EMAIL=${WALLABAG_FROM_EMAIL}
+  #     - SYMFONY__ENV__DOMAIN_NAME=${WALLABAG_DOMAIN_NAME}
+  #     - SYMFONY__ENV__SERVER_NAME=${WALLABAG_SERVER_NAME:-wallabag}
+  #   networks:
+  #     - media
+  #   ports:
+  #     - 8092:80
+  #   volumes:
+  #     - ${CONFIG_BASE_DIR}/wallabag/images:/var/www/wallabag/web/assets/images
+  #   healthcheck:
+  #     test: ["CMD", "wget" ,"--no-verbose", "--tries=1", "--spider", "http://localhost"]
+  #     interval: 1m
+  #     timeout: 3s
 
-  wallabag_db:
-    image: mariadb
-    container_name: wallabag_db
-    hostname: wallabag-db
-    environment:
-      - MYSQL_ROOT_PASSWORD=${WALLABAG_DATABASE_ROOT_PASSWORD}
-    networks:
-      - media
-    volumes:
-      - ${CONFIG_BASE_DIR}/wallabag/database:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-      interval: 20s
-      timeout: 3s
+  # wallabag_db:
+  #   image: mariadb
+  #   container_name: wallabag_db
+  #   hostname: wallabag-db
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=${WALLABAG_DATABASE_ROOT_PASSWORD}
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - ${CONFIG_BASE_DIR}/wallabag/database:/var/lib/mysql
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+  #     interval: 20s
+  #     timeout: 3s
 
-  wallabag_redis:
-    image: redis:alpine
-    container_name: wallabag_redis
-    hostname: wallabag-redis
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 20s
-      timeout: 3s
-
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    hostname: watchtower
-    environment:
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - TZ=${TZ}
-      - UMASK=${UMASK}
-      - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_INCLUDE_RESTARTING=true
-      - WATCHTOWER_INCLUDE_STOPPED=true
-      - WATCHTOWER_LABEL_ENABLE=false
-      - WATCHTOWER_NOTIFICATION_REPORT=true
-      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_NOTIFICATION_URL}
-      - WATCHTOWER_POLL_INTERVAL=${WATCHTOWER_POLL_INTERVAL}
-      - WATCHTOWER_REMOVE_VOLUMES=true
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-    networks:
-      - media
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    restart: unless-stopped
+  # wallabag_redis:
+  #   image: redis:alpine
+  #   container_name: wallabag_redis
+  #   hostname: wallabag-redis
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 20s
+  #     timeout: 3s
 
 networks:
   media:
