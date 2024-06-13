@@ -8,7 +8,7 @@ NAS or media center
 - [docker-compose-media-center](#docker-compose-media-center)
   - [Useful Resources To Have On-hand](#useful-resources-to-have-on-hand)
   - [Docker Compose Files and the Applications and Services Within](#docker-compose-files-and-the-applications-and-services-within)
-    - [`docker-compose-portainer.yaml`](#docker-compose-portaineryaml)
+    - [`portainer/docker-compose-portainer.yaml`](#portainerdocker-compose-portaineryaml)
     - [`docker-compose-tools.yaml`](#docker-compose-toolsyaml)
     - [`docker-compose-crypto.yaml`](#docker-compose-cryptoyaml)
     - [`docker-compose-downloaders.yaml`](#docker-compose-downloadersyaml)
@@ -54,7 +54,7 @@ some associated assisting tools, media players, and also miscellaneous self-host
 tools you can skip and and/or remove from as well as mostly links to their
 associated Docker image sources, GitHub repositories, or
 
-### `docker-compose-portainer.yaml`
+### `portainer/docker-compose-portainer.yaml`
 
 - [Portainer](https://hub.docker.com/r/portainer/portainer) Portainer for
   managing the remaining "Stacks" (docker-compose files).
@@ -201,17 +201,24 @@ container I wanted to up to it.
 
 3. Edit and move the file `environment_variables.env.example` saving it to the
 file to `.env` substituting with values you have after starting and setting up
-many of the services and applications. **IMPORTANT NOTE:** Complete these
-sections as each **must** be completed as outlined _before_ moving to
-the next step:
+many of the services and applications. **IMPORTANT NOTE:** Complete the few
+values
+necessary and update the `.env` files as you go. You must complete each **must**
+service _before_ moving to the next step. This means your `.env` file does not
+need to have ALL the correct values from the start. Just as long as you have the
+values Docker compose needs then everything should proceed smoothly:
     - [Directory Structure](#directory-structure)
     - [Environment Variables](#environment-variables)
-4. Run these `docker compose` commands in order (**Note:** there are few
+1. Run these `docker compose` commands in order (**Note:** there are few
   `depends_on` throughout though internally the `docker-compose-downloaders.yaml`
   file has containers which are dependent on another - i.e. `sabnzbd` and `deluge`
   use the `gluetun` network service to utilize it's utility as a VPN killswitch):
-    - First things first so we get the Portainer instance going:
-      - `docker compose --file docker-compose-portainer.yaml --env-file .env up --detach`
+    - First thing we do is make sure the portainer Docker compose file is in the
+      `portainer/` directory. This is because Portainer is weird and launches
+      with a stack named after the parent directory to the image it is launch is
+      called. This way in our case it will be `portainer` now:
+      - `cd portainer/`
+      - `docker compose --file docker-compose-portainer.yaml --env-file ../.env up --detach`
     - And now for the rest:
       - `docker compose --file docker-compose-tools.yaml --env-file .env up --detach`
       - `docker compose --file docker-compose-downloaders.yaml --env-file .env up --detach`
@@ -309,8 +316,8 @@ cp resources/prometheus/prometheus.yaml ${CONFIG_BASE_DIR}/prometheus/config/
 ```
 
 For **Grafana** you will want to import the dashboard from
-`reources/grafana/servarr_dashboard.json` into the utility after the service has
-been started.
+`reources/grafana/servarr_dashboard.json` into the utility through the UI after
+the service has been started.
 
 ## Environment Variables
 
