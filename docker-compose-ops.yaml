@@ -27,7 +27,7 @@ services:
       - grafana_postgres
     environment:
       - GF_DATABASE_TYPE=postgres
-      - GF_DATABASE_HOST=grafana_postgres
+      - GF_DATABASE_HOST=grafana-postgres
       - GF_DATABASE_NAME=${GRAFANA_DATABASE_NAME}
       - GF_DATABASE_USER=${GRAFANA_DATABASE_USER}
       - GF_DATABASE_PASSWORD=${GRAFANA_DATABASE_PASSWORD}
@@ -108,7 +108,7 @@ services:
     ports:
     - 6379:6379
 
-  snmp-exporter:
+  snmp_exporter:
     image: prom/snmp-exporter:latest
     container_name: snmp_exporter
     hostname: snmp-exporter
@@ -123,10 +123,10 @@ services:
     read_only: true
     security_opt:
       - no-new-privileges:true
-    volumes:
-      - ${CONFIG_BASE_DIR}/grafana/snmp:/etc/snmp_exporter/:ro
     command:
       - '--config.file=/etc/snmp_exporter/snmp.yaml'
+    volumes:
+      - ${CONFIG_BASE_DIR}/grafana/snmp:/etc/snmp_exporter/:ro
     restart: on-failure:5
 
   watchtower:
