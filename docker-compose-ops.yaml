@@ -5,36 +5,68 @@
 version: "3.9"
 
 services:
+  alertmanager:
+    container_name: alertmanager
+    hostname: alertmanager
+    image: prom/alertmanager:v0.27.0
+    user: 1024:100
+    volumes:
+      - ${CONFIG_BASE_DIR}/prometheus/config/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ${CONFIG_BASE_DIR}/prometheus/config/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    ports:
+      - 9093:9093
+    restart: always
+  
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
-    ports:
-    - 8585:8080
+    hostname: cadvisor
+    networks:
+      - media
+    user: 1024:100
+    mem_limit: 256m
+    mem_reservation: 64m
+    cpu_shares: 512
+    security_opt:
+      - no-new-privileges=true
+    # read_only: true
     volumes:
-    - /:/rootfs:ro
-    - /var/run:/var/run:rw
-    - /sys:/sys:ro
-    - /var/run/docker.sock:/var/run/docker.sock:ro
-    depends_on:
-    - redis
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command:
+      - '--docker_only=true'
+    restart: unless-stopped
 
   grafana:
     image: grafana/grafana-enterprise:latest
     container_name: grafana
     hostname: grafana
-    user: root
     depends_on:
       - grafana_postgres
+    user: 1024:100
     environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
       - GF_DATABASE_TYPE=postgres
       - GF_DATABASE_HOST=grafana-postgres
       - GF_DATABASE_NAME=${GRAFANA_DATABASE_NAME}
       - GF_DATABASE_USER=${GRAFANA_DATABASE_USER}
       - GF_DATABASE_PASSWORD=${GRAFANA_DATABASE_PASSWORD}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,natel-discrete-panel,grafana-piechart-panel
       # - GF_INSTALL_PLUGINS=grafana-clock-panel
       # - GF_SERVER_ROOT_URL=http://my.grafana.server/
     networks:
       - media
+    mem_limit: 512m
+    cpu_shares: 512
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:3000/api/health
     volumes:
       - ${CONFIG_BASE_DIR}/grafana/storage:/var/lib/grafana
     ports:
@@ -45,7 +77,12 @@ services:
     image: postgres:16-alpine
     container_name: grafana_postgres
     hostname: grafana-postgres
+    user: 1024:100
     environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
       - POSTGRES_DB=${GRAFANA_DATABASE_NAME}
       - POSTGRES_USER=${GRAFANA_DATABASE_USER}
       - POSTGRES_PASSWORD=${GRAFANA_DATABASE_PASSWORD}
@@ -64,11 +101,43 @@ services:
       - PUID=${PUID}
       - TZ=${TZ}
       - UMASK=${UMASK}
+    user: 1024:100
     networks:
       - media
     ports:
       - 5201:5201
     command: '--server'
+    restart: unless-stopped
+
+  node_exporter:
+    image: prom/node-exporter:latest
+    container_name: node_exporter
+    hostname: node-exporter
+    environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    mem_limit: 256m
+    mem_reservation: 64m
+    cpu_shares: 512
+    security_opt:
+      - no-new-privileges=true
+    # read_only: true
+    user: 1024:100
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:9100/
+    command:
+      - --collector.disable-defaults
+      - --collector.stat
+      - --collector.time
+      - --collector.cpu
+      - --collector.loadavg
+      - --collector.hwmon
+      - --collector.meminfo
+      - --collector.diskstats
     restart: unless-stopped
 
   ofelia:
@@ -80,54 +149,110 @@ services:
       - ${CONFIG_BASE_DIR}/ofelia/jobs.ini:/etc/ofelia/config.ini
     restart: unless-stopped
 
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: prometheus
+  #   hostname: prometheus
+  #   # TODO: This is such a stupid hack
+  #   user: root
+  #   depends_on:
+  #   - cadvisor
+  #   environment:
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   networks:
+  #     - media
+  #   volumes:
+  #     - ${CONFIG_BASE_DIR}/prometheus/config:/etc/prometheus
+  #     - ${CONFIG_BASE_DIR}/prometheus/data:/prometheus
+  #   ports:
+  #     - 9090:9090
+  #   command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yaml
+  #   restart: unless-stopped
+
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus
     container_name: prometheus
     hostname: prometheus
-    # TODO: This is such a stupid hack
-    user: root
-    depends_on:
-    - cadvisor
     environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
       - TZ=${TZ}
       - UMASK=${UMASK}
     networks:
       - media
+    mem_limit: 1g
+    cpu_shares: 768
+    security_opt:
+      - no-new-privileges=true
+    user: 1024:100
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:9090/ || exit 1
     volumes:
-      - ${CONFIG_BASE_DIR}/prometheus/config:/etc/prometheus
-      - ${CONFIG_BASE_DIR}/prometheus/data:/prometheus
+      - ${CONFIG_BASE_DIR}/prometheus/data:/prometheus:rw
+      - ${CONFIG_BASE_DIR}/prometheus/config/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
     ports:
       - 9090:9090
-    command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yaml
+    command:
+      - '--storage.tsdb.retention.time=60d'
+      - '--config.file=/etc/prometheus/prometheus.yaml'
     restart: unless-stopped
 
   redis:
     image: redis:latest
     container_name: redis
     hostname: redis
+    environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    user: 1024:100
     ports:
     - 6379:6379
 
-  snmp_exporter:
+  snmp-exporter:
     image: prom/snmp-exporter:latest
     container_name: snmp_exporter
     hostname: snmp-exporter
-    user: 1024:100
+    environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
     networks:
       - media
-    cpu_shares: 512
-    healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:9116/ || exit 1
     mem_limit: 256m
     mem_reservation: 64m
-    read_only: true
+    cpu_shares: 512
     security_opt:
       - no-new-privileges:true
-    command:
-      - '--config.file=/etc/snmp_exporter/snmp.yaml'
+    # read_only: true
+    user: 1024:100
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:9116/ || exit 1
     volumes:
-      - ${CONFIG_BASE_DIR}/grafana/snmp:/etc/snmp_exporter/:ro
-    restart: on-failure:5
+      - ${CONFIG_BASE_DIR}/prometheus/snmp/snmp.yml:/etc/snmp_exporter/snmp.yml:ro
+    command:
+      - '--config.file=/etc/snmp_exporter/snmp.yml'
+    restart: unless-stopped
+
+  speedtest_exporter:
+    image: ghcr.io/danopstech/speedtest_exporter:latest
+    container_name: speedtest_exporter
+    hostname: speedtest-exporter
+    environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    networks:
+      - media
+    security_opt:
+      - no-new-privileges=true
+    # read_only: true
+    user: 1024:100
+    restart: unless-stopped
 
   watchtower:
     image: containrrr/watchtower
