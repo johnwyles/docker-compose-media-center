@@ -567,13 +567,13 @@ _relative_ to the container (i.e. **not** the actual location of the files on
 
   Now personal notes to myself on some of that which remains:
 
-- **P0:** Consider adding [photoprism](https://github.com/photoprism/photoprism)
+- **P0**: Fix grafana and prometheus
 - **P1:** Consider adding [Lemmy](https://blog.colic.io/2023/07/07/self-hosting-lemmy-a-step-by-step-guide-with-docker-compose/)
 - **P1:** Add instructions for wiring everything together (with pictures?)
 - **P1:** Add instructions for Gluetun containers to replace those found below
 - **P2:** Add `ports` and whatever else from `docker-compose-*.yaml` files to be
   passed as ENV variables
-- **P3:** See if SearXNG needs more tuning and spend some time with it
+- **P3:** See if `SearXNG` needs more tuning and add it?
 - **P3:** Add `rana` and `vanity-age` executables, Docker build instructions, and
   `docker compose` running instructions
 - **P3:** Figure out searxng

@@ -2,31 +2,33 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: "prometheus"
+  - job_name: prometheus
     static_configs:
-      - targets: ["localhost:9090"]
+      - targets: ['localhost:9090']
+        labels:
+          group: prometheus
 
-  - job_name: "bazarr-exporter"
+  - job_name: bazarr-exporter
     static_configs:
       - targets: ["bazarr-exporter:9712"]
 
-  - job_name: "lidarr-exporter"
+  - job_name: lidarr-exporter
     static_configs:
       - targets: ["lidarr-exporter:9711"]
 
-  - job_name: "prowlarr-exporter"
+  - job_name: prowlarr-exporter
     static_configs:
       - targets: ["prowlarr-exporter:9709"]
 
-  - job_name: "radarr-exporter"
+  - job_name: radarr-exporter
     static_configs:
       - targets: ["radarr-exporter:9708"]
 
-  - job_name: "sabnzbd-exporter"
+  - job_name: sabnzbd-exporter
     static_configs:
       - targets: ["sabnzbd-exporter:9710"]
 
-  - job_name: "sonarr-exporter"
+  - job_name: sonarr-exporter
     static_configs:
       - targets: ["sonarr-exporter:9707"]
 
@@ -34,18 +36,12 @@ scrape_configs:
     static_configs:
       - targets: ["unpackerr:5656"]
 
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['localhost:9090']
-        labels:
-          group: 'prometheus'
-
-  - job_name: 'nodeexporter'
+  - job_name: nodeexporter
     scrape_interval: 5s
     static_configs:
       - targets: ['nodeexporter:9100']
   
-  - job_name: 'snmp'
+  - job_name: snmp
     scrape_interval: 5s
     static_configs:
       - targets: ['192.168.1.2']
@@ -68,7 +64,7 @@ scrape_configs:
     static_configs:
       - targets: ['cadvisor: 8585']
 
-  - job_name: 'speedtest'
+  - job_name: speedtest
     scrape_interval: 60m
     scrape_timeout:  60s
     metrics_path: /metrics
