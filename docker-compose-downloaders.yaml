@@ -11,30 +11,35 @@ services:
     cap_add:
       - NET_ADMIN
     environment:
-      - OPENVPN_PASSWORD=${VPN_PASS}
-      - OPENVPN_USER=${VPN_USER}
       - PGID=${PGID}
       - PUID=${PUID}
       - SERVER_COUNTRIES=${SERVER_COUNTRIES}
+      # - SERVER_REGIONS=${SERVER_REGIONS}
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      # - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - VPN_TYPE=${VPN_TYPE}
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      # - SERVER_HOSTNAMES=${SERVER_HOSTNAMES}
+      # - SERVER_CITIES=${SERVER_CITIES}
       - TZ=${TZ}
       - UMASK=${UMASK}
-      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
-      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
     networks:
       - media
     volumes:
       - ${CONFIG_BASE_DIR}/gluetun:/gluetun
     ports:
-      - 6000:9000/tcp
       - 6881:6881 # qbittorrent
       - 6881:6881/udp # qbittorrent
-      - 7000:8000/tcp
-      - 8112:8112 # deluge
-      - 8080:8080 # sabnzbd
       - 8091:8091 # qbittorrent
-      - 9091:9091 # transmission/transmission-openvpn
-      - 51413:51413 # transmission/transmission-openvpn
-      - 51413:51413/udp # transmission/transmission-openvpn
+      - 8080:8080 # sabnzbd
+      # - 8112:8112 # deluge
+      # - 6000:9000/tcp # ???
+      # - 7000:8000/udp # ???
+      # - 9091:9091 # transmission
+      # - 51413:51413 # transmission
+      # - 51413:51413/udp # transmission
+      # 6789:6789 # nzbget
     restart: unless-stopped
 
   # deluge:
@@ -55,45 +60,6 @@ services:
   #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
   #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
   #     - ${CONFIG_BASE_DIR}/deluge:/config
-  #   restart: unless-stopped
-
-  # delugevpn:
-  #   container_name: delugevpn
-  #   image: binhex/arch-delugevpn
-  #   cap_add:
-  #     - NET_ADMIN
-  #   environment:
-  #     VPN_ENABLED: ${VPN_ENABLED}
-  #     VPN_USER: ${VPN_USER}
-  #     VPN_PASS: ${VPN_PASS}
-  #     VPN_PROV: ${VPN_PROV}
-  #     VPN_OPTIONS: ${VPN_OPTIONS}
-  #     STRICT_PORT_FORWARD: ${STRICT_PORT_FORWARD}
-  #     ENABLE_PRIVOXY: ${ENABLE_PRIVOXY}
-  #     LAN_NETWORK: ${LAN_NETWORK}
-  #     NAME_SERVERS: ${NAME_SERVERS}
-  #     VPN_CLIENT: ${VPN_CLIENT}
-  #     DELUGE_ENABLE_WEBUI_PASSWORD: ${DELUGE_ENABLE_WEBUI_PASSWORD}
-  #     DELUGE_DAEMON_LOG_LEVEL: ${DELUGE_DAEMON_LOG_LEVEL}
-  #     DELUGE_WEB_LOG_LEVEL: ${DELUGE_WEB_LOG_LEVEL}
-  #     ADDITIONAL_PORTS: ${ADDITIONAL_PORTS}
-  #     DEBUG: ${DEBUG}
-  #     UMASK: ${UMASK}
-  #     PUID: ${PUID}
-  #     PGID: ${PGID}
-  #   networks:
-  #     - media
-  #   ports:
-  #     - 8112:8112
-  #     - 8118:8118
-  #     - 58846:58846
-  #     - 58946:58946/udp
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
-  #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
-  #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
-  #     - ${CONFIG_BASE_DIR}/delugevpn:/config
   #   restart: unless-stopped
 
   # nzbget:
@@ -120,45 +86,6 @@ services:
   #     - 6789:6789
   #   restart: unless-stopped
 
-  # nzbgetvpn:
-  #   image: jarlave/nzbgetvpn:2020112501
-  #   container_name: nzbgetvpn
-  #   hostname: nzbgetvpn
-  #   cap_add:
-  #     - NET_ADMIN
-  #   environment:
-  #     - VPN_ENABLED=${VPN_ENABLED}
-  #     - VPN_USER=${VPN_USER}
-  #     - VPN_PASS=${VPN_PASS}
-  #     - VPN_PROV=${VPN_PROV}
-  #     - VPN_OPTIONS=${VPN_OPTIONS}
-  #     - STRICT_PORT_FORWARD=${STRICT_PORT_FORWARD}
-  #     - ENABLE_PRIVOXY=${ENABLE_PRIVOXY}
-  #     - LAN_NETWORK=${LAN_NETWORK}
-  #     - NAME_SERVERS=${NAME_SERVERS}
-  #     - VPN_CLIENT=${VPN_CLIENT}
-  #     - DELUGE_ENABLE_WEBUI_PASSWORD=${DELUGE_ENABLE_WEBUI_PASSWORD}
-  #     - DELUGE_DAEMON_LOG_LEVEL=${DELUGE_DAEMON_LOG_LEVEL}
-  #     - DELUGE_WEB_LOG_LEVEL=${DELUGE_WEB_LOG_LEVEL}
-  #     - ADDITIONAL_PORTS=${ADDITIONAL_PORTS}
-  #     - DEBUG=${DEBUG}
-  #     - UMASK=${UMASK}
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #   networks:
-  #     - media
-  #   # network_mode: "service:transmission-openvpn"
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
-  #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
-  #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
-  #     - ${CONFIG_BASE_DIR}/nzbgetvpn:/config
-  #   ports:
-  #     # nzbget
-  #     - 6789:6789
-  #   restart: unless-stopped
-
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -168,6 +95,7 @@ services:
       - TZ=${TZ}
       - UMASK=${UMASK}
       - WEBUI_PORT=8091
+      - TORRENTING_PORT=6881
     network_mode: "service:gluetun"
     depends_on:
       - gluetun
@@ -196,73 +124,19 @@ services:
       - ${CONFIG_BASE_DIR}/sabnzbd:/config
     restart: unless-stopped
 
-  sabnzbd-exporter:
-    image: ghcr.io/onedr0p/exportarr:v2.0
-    container_name: sabnzbd-exporter
-    hostname: sabnzbd-exporter
-    environment:
-      PORT: 9711
-      URL: http://sabnzbd:8080
-      APIKEY: ${SABNZBD_API_KEY}
-    networks:
-      - media
-    ports:
-      - 9711:9711
-    command: ["sabnzbd"]
-    restart: unless-stopped
-
-  # sabnzbdvpn:
-  #   image: binhex/arch-sabnzbdvpn
-  #   container_name: sabnzbdvpn
-  #   hostname: 
-  #   cap_add:
-  #     - NET_ADMIN
+  # sabnzbd-exporter:
+  #   image: ghcr.io/onedr0p/exportarr:v2.0
+  #   container_name: sabnzbd-exporter
+  #   hostname: sabnzbd-exporter
   #   environment:
-  #     VPN_ENABLED: ${VPN_ENABLED}
-  #     VPN_USER: ${VPN_USER}
-  #     VPN_PASS: ${VPN_PASS}
-  #     VPN_PROV: ${VPN_PROV}
-  #     VPN_OPTIONS: ${VPN_OPTIONS}
-  #     STRICT_PORT_FORWARD: ${STRICT_PORT_FORWARD}
-  #     ENABLE_PRIVOXY: ${ENABLE_PRIVOXY}
-  #     LAN_NETWORK: ${LAN_NETWORK}
-  #     NAME_SERVERS: ${NAME_SERVERS}
-  #     VPN_CLIENT: ${VPN_CLIENT}
-  #     DELUGE_ENABLE_WEBUI_PASSWORD: ${DELUGE_ENABLE_WEBUI_PASSWORD}
-  #     DELUGE_DAEMON_LOG_LEVEL: ${DELUGE_DAEMON_LOG_LEVEL}
-  #     DELUGE_WEB_LOG_LEVEL: ${DELUGE_WEB_LOG_LEVEL}
-  #     ADDITIONAL_PORTS: ${ADDITIONAL_PORTS}
-  #     DEBUG: ${DEBUG}
-  #     UMASK: ${UMASK}
-  #     PUID: ${PUID}
-  #     PGID: ${PGID}
+  #     PORT: 9711
+  #     URL: http://sabnzbd:8080
+  #     APIKEY: ${SABNZBD_API_KEY}
   #   networks:
   #     - media
   #   ports:
-  #     - 8080:8080
-  #     - 8090:8090
-  #     - 8119:8118
-  #     # deluge
-  #     # - 8112:8112
-  #     # - 6881:6881
-  #     # - 6881:6881/udp
-  #     # - 9910:9910
-  #     # nzbget
-  #     # - 6789:6789
-  #     # sabnzbd
-  #     # - 8080:8080
-  #     # - 8090:8090
-  #     # - 8119:8118
-  #     #transmission
-  #     - 9091:9091
-  #     - 51413:51413
-  #     - 51413:51413/udp
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
-  #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
-  #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
-  #     - ${CONFIG_BASE_DIR}/sabnzbdvpn:/config
+  #     - 9711:9711
+  #   command: ["sabnzbd"]
   #   restart: unless-stopped
 
   # transmission:
@@ -282,10 +156,9 @@ services:
   #     - PUID=${PUID}
   #     - TRANSMISSION_DOWNLOAD_DIR=${DOWNLOADS_DIR_COMPLETE_RELATIVE}
   #     - TRANSMISSION_INCOMPLETE_DIR=${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
-
   #     # (optional) Download the ZIP file below and extract the contents to
-  #     # "flood-for-transmission" in the "[CONFIG_BASE_DIR]/transmission" location: 
-  #     #     https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.zip    
+  #     # "flood-for-transmission" in the "[CONFIG_BASE_DIR]/transmission" location:
+  #     #     https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.zip
   #     - TRANSMISSION_WEB_HOME=/config/flood-for-transmission
   #     - TRANSMISSION_WEB_UI=flood-for-transmission
 
@@ -305,67 +178,6 @@ services:
   #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
   #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
   #     - ${CONFIG_BASE_DIR}/transmission:/config
-  #   restart: unless-stopped
-
-  # transmission-openvpn:
-  #   image: haugene/transmission-openvpn
-  #   container_name: transmission-openvpn
-  #   hostname: transmission-openvpn
-  #   cap_add:
-  #     - NET_ADMIN
-  #   privileged: true
-  #   dns:
-  #     - 8.8.8.8
-  #     - 8.8.4.4
-  #   environment:
-  #     - DEBUG=${DEBUG}
-  #     - ENABLE_UFW=true
-  #     - GLOBAL_APPLY_PERMISSIONS=false
-  #     - HEALTH_CHECK_HOST=${HEALTH_CHECK_HOST}
-  #     - LOCAL_NETWORK=
-  #     - OPENVPN_CONFIG=${OPENVPN_CONFIG}
-  #     - OPENVPN_OPTS=${OPENVPN_OPTS}
-  #     - OPENVPN_PASSWORD=${VPN_PASS}
-  #     - OPENVPN_PROVIDER=${OPENVPN_PROVIDER}
-  #     - OPENVPN_USERNAME=${VPN_USER}
-  #     - PEER_DNS=false
-  #     - PEER_DNS_PIN_ROUTES=false
-  #     - PGID=${PGID}
-  #     - PUID=${PUID}
-  #     - TRANSMISSION_DOWNLOAD_DIR=${DOWNLOADS_DIR_COMPLETE_RELATIVE}
-  #     - TRANSMISSION_INCOMPLETE_DIR=${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
-  #     - TRANSMISSION_WEB_UI=flood-for-transmission
-  #     - TZ=${TZ}
-  #     - UFW_ALLOW_GW_NET=true
-  #     - UFW_DISABLE_IPTABLES_REJECT=true
-  #     - UFW_EXTRA_PORTS=6789,6881,8080,8112,9091,9910
-  #     - UMASK=${UMASK}
-  #   logging:
-  #     driver: json-file
-  #     options:
-  #       max-size: 10m
-  #   networks:
-  #     - media
-  #   command: [ "dumb-init", "/entrypoint.sh", "/etc/openvpn/start.sh" ]
-  #   volumes:
-  #     - ${DOWNLOADS_DIR_COMPLETE_LOCAL}:${DOWNLOADS_DIR_COMPLETE_RELATIVE}
-  #     - ${DOWNLOADS_DIR_INCOMPLETE_LOCAL}:${DOWNLOADS_DIR_INCOMPLETE_RELATIVE}
-  #     - ${DOWNLOADS_DIR_WATCH_LOCAL}:${DOWNLOADS_DIR_WATCH_RELATIVE}
-  #     - ${CONFIG_BASE_DIR}/transmission-openvpn:/config
-  #     - ${CONFIG_BASE_DIR}/transmission-openvpn/entrypoint.sh:/entrypoint.sh
-  #     - ${CONFIG_BASE_DIR}/transmission-openvpn/openvpn:/etc/openvpn/custom
-  #   ports:
-  #     # deluge
-  #     - 8112:8112
-  #     - 6881:6881
-  #     - 6881:6881/udp
-  #     - 9910:9910
-  #     # nzbget
-  #     - 6789:6789
-  #     # sabnzbd
-  #     - 8080:8080
-  #     #transmission
-  #     - 9091:9091
   #   restart: unless-stopped
 
   unpackerr:
@@ -422,9 +234,9 @@ services:
       - UN_SONARR_0_TIMEOUT=10s
       - UN_SONARR_0_URL=http://sonarr:8989
       - UN_START_DELAY=1m
+      - UN_WEBSERVER_LISTEN_ADDR=0.0.0.0:5656
       - UN_WEBSERVER_METRICS=true
-      # - UN_WEBSERVER_LISTEN_ADDR=0.0.0.0:5656
-      # - UN_WEBSERVER_URLBASE=/unpackerr_metrics
+      - UN_WEBSERVER_URLBASE=/unpackerr_metrics
       # TODO: Add Notifiarr for webhook
       # - UN_CMDHOOK_0_COMMAND=
       # - UN_CMDHOOK_0_EVENTS_0=0

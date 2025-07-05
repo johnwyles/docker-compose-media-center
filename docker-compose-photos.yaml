@@ -28,7 +28,7 @@ services:
       - ${PHOTOS_DIR_LOCAL}:/usr/src/app/upload
     ports:
       - 2283:3001
-    command: ['start.sh', 'immich']
+    command: ["start.sh", "immich"]
     restart: unless-stopped
 
   immich_microservices:
@@ -52,7 +52,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${PHOTOS_DIR_LOCAL}:/usr/src/app/upload
-    command: ['start.sh', 'microservices']
+    command: ["start.sh", "microservices"]
     restart: unless-stopped
 
   immich_machine_learning:
@@ -111,7 +111,22 @@ services:
       interval: 5m
       start_interval: 30s
       start_period: 5m
-    command: ["postgres", "-c" ,"shared_preload_libraries=vectors.so", "-c", 'search_path="$$user", public, vectors', "-c", "logging_collector=on", "-c", "max_wal_size=2GB", "-c", "shared_buffers=512MB", "-c", "wal_compression=on"]
+    command:
+      [
+        "postgres",
+        "-c",
+        "shared_preload_libraries=vectors.so",
+        "-c",
+        'search_path="$$user", public, vectors',
+        "-c",
+        "logging_collector=on",
+        "-c",
+        "max_wal_size=2GB",
+        "-c",
+        "shared_buffers=512MB",
+        "-c",
+        "wal_compression=on",
+      ]
     restart: unless-stopped
 
   photoprism:
