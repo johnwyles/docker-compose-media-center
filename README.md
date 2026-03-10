@@ -1,7 +1,7 @@
 # docker-compose-media-center
 
 This respository contains the Docker compose files for standing up an entire Servarr
-stack along with a other supporting tools and services best suited for an at-home
+stack along with other supporting tools and services best suited for an at-home
 NAS or media center
 
 **Table of contents:**
@@ -587,3 +587,4 @@ pushd ${CONFIG_BASE_DIR}/transmission-openvpn/
   unzip openvpn.zip
 popd
 ```
+
