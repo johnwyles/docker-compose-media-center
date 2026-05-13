@@ -157,7 +157,7 @@ services:
       - DNSMASQ_USER=${PIHOLE_DNSMASQ_USER:-root}
       - PGID=${PGID}
       - PUID=${PUID}
-      - TZ=${TZ}https://docs.pi-hole.net/docker/https://docs.pi-hole.net/docker/
+      - TZ=${TZ}
       - UMASK=${UMASK}
       - FTLCONF_webserver_api_password=${PIHOLE_WEB_PASSWORD}
       - FTLCONF_dns_listeningMode=${PIHOLE_DNS_LISTENING_MODE}
