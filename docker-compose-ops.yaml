@@ -149,6 +149,37 @@ services:
       - ${CONFIG_BASE_DIR}/ofelia/jobs.ini:/etc/ofelia/config.ini
     restart: unless-stopped
 
+  pihole:
+    container_name: pihole
+    hostname: pihole
+    image: pihole/pihole:latest
+    environment:
+      - DNSMASQ_USER=${PIHOLE_DNSMASQ_USER:-root}
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}https://docs.pi-hole.net/docker/https://docs.pi-hole.net/docker/
+      - UMASK=${UMASK}
+      - FTLCONF_webserver_api_password=${PIHOLE_WEB_PASSWORD}
+      - FTLCONF_dns_listeningMode=${PIHOLE_DNS_LISTENING_MODE}
+      - FTLCONF_dns_upstreams=${PIHOLE_DNS_UPSTREAMS}
+    networks:
+      - media
+    volumes:
+      - ${CONFIG_BASE_DIR}/pihole:/etc/pihole
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    cap_add:
+      - NET_ADMIN
+      - SYS_TIME
+      - SYS_NICE
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+      - 7080:80
+      - 7443:443
+    restart: unless-stopped
+
   # prometheus:
   #   image: prom/prometheus:latest
   #   container_name: prometheus
